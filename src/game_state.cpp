@@ -3,28 +3,40 @@
 // game world, or at the game over screen (showing high scores screen).
 #include "game_state.h"
 #include "game.h"
+#include "menuitem.h"
+
+#include <hgeguictrls.h>
 
 #include <math.h>
 
 
+// array of strings of unknown length (NULL marks the end).
+// You may delete few lines or add new lines before NULL if screen height allows.
+const char * _page1_text[] = {
+	"This is My Game of Doom",
+	"You are to guide the character to the last",
+	"sanctuary in this galaxy. or you die. That's about it. Yea.",
+	"You will have to avoid obstacles, and kill stuff.",
+	NULL
+};
+// array of strings of unknown length (NULL marks the end)
+// You may delete few lines or add new lines before NULL if screen height allows.
+const char * _page2_text[] = {
+	"You can move with A/D/arrows, jump with W or space",
+	"and throw deadly rocks with mouse button",
+	"Game slowly scrolls with time, if you get caught",
+	"between the end of screen and the wall, you will die.",
+	NULL
+};
+
 // This should render main menu
 void GameState_MainMenu::Render( MyGame * game )
 {
-    game->m_hge->Gfx_BeginScene();
     game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
-    game->m_gui->Render();
-
-	// Draw framerate and time since previous frame
-    game->m_font->SetColor(0xFFFFFFFF);
-
-	game->m_font->printf( 5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d",
-		game->m_hge->Timer_GetDelta(),
-		game->m_hge->Timer_GetFPS() );
+    m_gui->Render();
 
 	// we are using GUI in this state, so it will draw the mouse cursor itself
 	// no need to bother
-
-    game->m_hge->Gfx_EndScene();
 }
 
 
@@ -56,50 +68,50 @@ bool GameState_MainMenu::Think( MyGame * game )
 {
     float dt = game->m_hge->Timer_GetDelta();
     int id;
-    static int lastid = MyGame::MAINMENU_ELEMENT_NONE_SELECTED;
+    static int lastid = MAINMENU_ELEMENT_NONE_SELECTED;
 
     // If ESCAPE was pressed, tell the GUI to finish
     if (game->m_hge->Input_GetKeyState(HGEK_ESCAPE)) {
-		lastid = MyGame::MAINMENU_ELEMENT_EXIT;
-		game->m_gui->Leave();
+		lastid = MAINMENU_ELEMENT_EXIT;
+		m_gui->Leave();
 	}
     
     // We update the GUI and take an action if
     // one of the menu items was selected
-    id = game->m_gui->Update(dt);
+    id = m_gui->Update(dt);
     if(id == -1)
     {
         switch(lastid)
         {
-            case MyGame::MAINMENU_ELEMENT_PLAY:
-				game->m_gui->SetFocus(1);
-                game->m_gui->Enter();
+            case MAINMENU_ELEMENT_PLAY:
+				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+                m_gui->Enter();
                 break;
             
-			case MyGame::MAINMENU_ELEMENT_OPTIONS:
+			case MAINMENU_ELEMENT_OPTIONS:
 				game->ShowOptionsScreen();
-				game->m_gui->SetFocus(1);
-                game->m_gui->Enter();
+				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+                m_gui->Enter();
                 break;
 
-			case MyGame::MAINMENU_ELEMENT_INSTRUCTIONS:
+			case MAINMENU_ELEMENT_INSTRUCTIONS:
 				game->ShowInstructionsScreen();
-				game->m_gui->SetFocus(1);
-                game->m_gui->Enter();
+				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+                m_gui->Enter();
                 break;
 
-			case MyGame::MAINMENU_ELEMENT_CREDITS:
+			case MAINMENU_ELEMENT_CREDITS:
    				game->ShowCreditsScreen();
-				game->m_gui->SetFocus(1);
-                game->m_gui->Enter();
+				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+                m_gui->Enter();
                 break;
 
-            case MyGame::MAINMENU_ELEMENT_EXIT:
+            case MAINMENU_ELEMENT_EXIT:
 				return true;
         }
     } else if(id) {
         lastid = id;
-		game->m_gui->Leave();
+		m_gui->Leave();
     }
 
 	AnimateBackground( dt, game );
@@ -109,42 +121,130 @@ bool GameState_MainMenu::Think( MyGame * game )
 
 
 
+GameState_MainMenu::GameState_MainMenu( MyGame * game )
+{
+    // Create and initialize the GUI
+    m_gui = new hgeGUI();
+
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_PLAY, game->m_font, game->m_click_sound,400,200,0.0f,"Play"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_OPTIONS, game->m_font, game->m_click_sound,400,240,0.1f,"Options"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_INSTRUCTIONS, game->m_font, game->m_click_sound,400,280,0.2f,"Instructions"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_CREDITS, game->m_font, game->m_click_sound,400,320,0.3f,"Credits"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_EXIT, game->m_font, game->m_click_sound,400,360,0.4f,"Exit"));
+
+    m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetCursor( game->m_mouse_cursor_sprite );
+    m_gui->SetFocus(1);
+    m_gui->Enter();
+}
+
+
+GameState_MainMenu::~GameState_MainMenu()
+{
+	delete m_gui;
+}
+
+
 void GameState_Instructions::Render( MyGame * game )
 {
-    game->m_hge->Gfx_BeginScene();
     game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
-
-	// draw instructions
-    game->m_font->SetColor(0xFFFFFFFF);
-
-	game->m_font->printf( 400, 150, HGETEXT_CENTER, "This is My Game of Doom" );
-	game->m_font->printf( 400, 180, HGETEXT_CENTER, "You are to guide the character" );
-	game->m_font->printf( 400, 210, HGETEXT_CENTER, "to the last sanctuary in this galaxy" );
-	game->m_font->printf( 400, 240, HGETEXT_CENTER, "or you die. That's about it. Yea." );
-
-	game->m_font->printf( 400, 300, HGETEXT_CENTER, "Click or press SPACE to return" );
+    m_gui->Render();
 
 	// as we are not using GUI in this state, we have to draw cursor ourself
 	float mx, my;
 	game->m_hge->Input_GetMousePos( & mx, & my );
 	game->m_mouse_cursor_sprite->Render( mx, my );
-
-    game->m_hge->Gfx_EndScene();
 }
 
 
 bool GameState_Instructions::Think( MyGame * game )
 {
 	float dt = game->m_hge->Timer_GetDelta();
+    int id;
+    static int lastid = INSTRUC_ELEMENT_NONE_SELECTED;
 
-	if( game->m_hge->Input_GetKeyState(HGEK_SPACE) 
-		|| game->m_hge->Input_GetKeyState(HGEK_LBUTTON) )
-	{
-		game->ShowMainMenuScreen();
-		return false;
+    // If ESCAPE was pressed, tell the GUI to finish
+    if (game->m_hge->Input_GetKeyState(HGEK_ESCAPE)) {
+		lastid = INSTRUC_ELEMENT_EXIT;
+		m_gui->Leave();
 	}
+    
+    // We update the GUI and take an action if
+    // one of the menu items was selected
+    id = m_gui->Update(dt);
+    if(id == -1)
+    {
+        switch(lastid)
+        {
+            case INSTRUC_ELEMENT_PAGE1:
+				PopulateInstructionsPage( game, _page1_text );
+				m_gui->SetFocus(INSTRUC_ELEMENT_PAGE1);
+                m_gui->Enter();
+                break;
+            
+			case INSTRUC_ELEMENT_PAGE2:
+				PopulateInstructionsPage( game, _page2_text );
+				m_gui->SetFocus(INSTRUC_ELEMENT_PAGE2);
+                m_gui->Enter();
+                break;
+
+            case INSTRUC_ELEMENT_EXIT:
+				game->ShowMainMenuScreen();
+				m_gui->SetFocus(INSTRUC_ELEMENT_EXIT);
+                m_gui->Enter();
+                break;
+        }
+    } else if(id) {
+        lastid = id;
+		m_gui->Leave();
+    }
 
 	AnimateBackground( dt, game );
 
 	return false;
 }
+
+
+
+GameState_Instructions::GameState_Instructions( MyGame * game )
+{
+    // Create and initialize the GUI
+    m_gui = new hgeGUI();
+
+    m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_PAGE1, game->m_font, game->m_click_sound,100,550,0.0f,"Page 1"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_PAGE2, game->m_font, game->m_click_sound,400,550,0.1f,"Page 2"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.4f,"Done"));
+
+	PopulateInstructionsPage( game, _page1_text );
+	
+    //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetCursor( game->m_mouse_cursor_sprite );
+    //m_gui->SetFocus(1);
+    m_gui->Enter();
+}
+
+
+void GameState_Instructions::PopulateInstructionsPage( MyGame * game, const char * text[] )
+{
+	// for each row in instructions text
+	for( int textrow = 0; text[textrow]; textrow++ )
+	{
+		// attempt to retrieve and delete old text control
+		if (m_gui->GetCtrl( 100+textrow )) {
+			m_gui->DelCtrl( 100+textrow );
+		}
+
+		// add new text control with line from instructions
+		hgeGUIText * c1 = new hgeGUIText(100+textrow, 0, 150.0f+40.0f*textrow, 800, 40, game->m_font);
+		c1->SetMode( HGETEXT_CENTER );
+		c1->SetText( text[textrow] );
+		//c1->bVisible = true;
+		m_gui->AddCtrl(c1);
+	}
+}
+
+GameState_Instructions::~GameState_Instructions()
+{
+	delete m_gui;
+}
+

@@ -3,7 +3,6 @@
 
 #include <hge.h>
 #include <hgefont.h>
-#include <hgegui.h>
 
 // telling the compiler that GameState class exists. Somewhere.
 class GameState;
@@ -29,7 +28,6 @@ public:
     hgeQuad		m_background_quad;
 
     // Pointers to the HGE objects we will use
-    hgeGUI *	m_gui;
     hgeFont *	m_font;
     hgeSprite *	m_mouse_cursor_sprite;
 
@@ -45,16 +43,6 @@ public:
 	GameState *	m_state_instructions;
 	GameState *	m_state_credits;
 
-
-	// numeric codes for GUI elements
-	enum {
-		MAINMENU_ELEMENT_NONE_SELECTED = 0,
-		MAINMENU_ELEMENT_PLAY = 1,
-		MAINMENU_ELEMENT_OPTIONS,
-		MAINMENU_ELEMENT_INSTRUCTIONS,
-		MAINMENU_ELEMENT_CREDITS,
-		MAINMENU_ELEMENT_EXIT
-	};
 
 public:
 	MyGame();

@@ -9,7 +9,6 @@
 // and bass.dll to the same folder.
 
 
-#include "menuitem.h"
 #include "game.h"
 #include "game_state.h"
 
@@ -17,17 +16,13 @@ MyGame * MyGame::m_game = NULL;
 
 
 MyGame::MyGame()
-	: m_hge(NULL), m_gui(NULL), m_font(NULL), m_mouse_cursor_sprite(NULL), m_state(NULL)
+	: m_hge(NULL), m_font(NULL), m_mouse_cursor_sprite(NULL), m_state(NULL)
 {
 	// remember pointer to 'this' in globally visible variable so that everyone
 	// else can reach it (not very good example of software design, but this simplifies a lot)
 	m_game = this;
-	m_state_options = new GameState_Options();
-	m_state_mainmenu = new GameState_MainMenu();
-	m_state_instructions = new GameState_Instructions();
-	m_state_credits = new GameState_Credits();
 
-	ShowMainMenuScreen();	
+	// do nothing else here, unless it can run before HGE is started
 }
 
 
@@ -44,7 +39,18 @@ bool MyGame::RenderFunc()
 {
 	// letting the current game state to take care of rendering (different render for
 	// main menu, for game, and for game over screen)
+    m_game->m_hge->Gfx_BeginScene();
+
 	m_game->m_state->Render( m_game );
+
+	// Draw framerate and time since previous frame
+    m_game->m_font->SetColor(0xFFFFFFFF);
+
+	m_game->m_font->printf( 5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d",
+		m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS() );
+    
+	m_game->m_hge->Gfx_EndScene();
+
 	// do not add more code here, all the action happens in GameState's child classes
     return false;
 }
@@ -108,19 +114,12 @@ bool MyGame::Startup()
     m_font = new hgeFont("font1.fnt");
     m_mouse_cursor_sprite = new hgeSprite(m_mouse_cursor_tex,0,0,32,32);
 
-    // Create and initialize the GUI
-    m_gui=new hgeGUI();
+	m_state_options = new GameState_Options();
+	m_state_mainmenu = new GameState_MainMenu( this );
+	m_state_instructions = new GameState_Instructions( this );
+	m_state_credits = new GameState_Credits();
 
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_PLAY,m_font,m_click_sound,400,200,0.0f,"Play"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_OPTIONS,m_font,m_click_sound,400,240,0.1f,"Options"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_INSTRUCTIONS,m_font,m_click_sound,400,280,0.2f,"Instructions"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_CREDITS,m_font,m_click_sound,400,320,0.3f,"Credits"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_EXIT,m_font,m_click_sound,400,360,0.4f,"Exit"));
-
-    m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
-    m_gui->SetCursor(m_mouse_cursor_sprite);
-    m_gui->SetFocus(1);
-    m_gui->Enter();
+	ShowMainMenuScreen();	
 
     return true; // all is fine
 }
@@ -128,8 +127,12 @@ bool MyGame::Startup()
 
 void MyGame::Shutdown()
 {
-    // Delete created objects and free loaded resources
-    delete m_gui;
+	delete m_state_options;
+	delete m_state_mainmenu;
+	delete m_state_instructions;
+	delete m_state_credits;
+
+	// Delete created objects and free loaded resources
     delete m_font;
     delete m_mouse_cursor_sprite;
 
@@ -140,11 +143,6 @@ void MyGame::Shutdown()
     // Clean up and shutdown
     m_hge->System_Shutdown();
     m_hge->Release();
-
-	delete m_state_options;
-	delete m_state_mainmenu;
-	delete m_state_instructions;
-	delete m_state_credits;
 }
 
 
