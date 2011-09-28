@@ -39,20 +39,20 @@ bool MyGame::RenderFunc()
 {
 	// letting the current game state to take care of rendering (different render for
 	// main menu, for game, and for game over screen)
-    m_game->m_hge->Gfx_BeginScene();
+	m_game->m_hge->Gfx_BeginScene();
 
 	m_game->m_state->Render( m_game );
 
 	// Draw framerate and time since previous frame
-    m_game->m_font->SetColor(0xFFFFFFFF);
+	m_game->m_font->SetColor(0xFFFFFFFF);
 
 	m_game->m_font->printf( 5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d",
-		m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS() );
+					m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS() );
     
 	m_game->m_hge->Gfx_EndScene();
 
 	// do not add more code here, all the action happens in GameState's child classes
-    return false;
+	return false;
 }
 
 
@@ -97,31 +97,31 @@ bool MyGame::Startup()
         m_background_quad.v[i].col=ARGB(0xFF, 0xFF, 0xFF, 0xFF);
     }
 
-    m_background_quad.v[0].x=0;
+	m_background_quad.v[0].x=0;
 	m_background_quad.v[0].y=0; 
 
-    m_background_quad.v[1].x=800;
+	m_background_quad.v[1].x=800;
 	m_background_quad.v[1].y=0;
 
-    m_background_quad.v[2].x=800;
+	m_background_quad.v[2].x=800;
 	m_background_quad.v[2].y=600; 
 
-    m_background_quad.v[3].x=0;
+	m_background_quad.v[3].x=0;
 	m_background_quad.v[3].y=600; 
 
 
-    // Load the font, create the cursor sprite
-    m_font = new hgeFont("font1.fnt");
-    m_mouse_cursor_sprite = new hgeSprite(m_mouse_cursor_tex,0,0,32,32);
+	// Load the font, create the cursor sprite
+	m_font = new hgeFont("font1.fnt");
+	m_mouse_cursor_sprite = new hgeSprite(m_mouse_cursor_tex,0,0,32,32);
 
 	m_state_options = new GameState_Options();
 	m_state_mainmenu = new GameState_MainMenu( this );
 	m_state_instructions = new GameState_Instructions( this );
-	m_state_credits = new GameState_Credits();
+	m_state_credits = new GameState_Credits( this );
 
 	ShowMainMenuScreen();	
 
-    return true; // all is fine
+	return true; // all is fine
 }
 
 
@@ -133,16 +133,16 @@ void MyGame::Shutdown()
 	delete m_state_credits;
 
 	// Delete created objects and free loaded resources
-    delete m_font;
-    delete m_mouse_cursor_sprite;
+	delete m_font;
+	delete m_mouse_cursor_sprite;
 
 	m_hge->Effect_Free(m_click_sound);
-    m_hge->Texture_Free(m_mouse_cursor_tex);
-    m_hge->Texture_Free(m_background_quad.tex);
+	m_hge->Texture_Free(m_mouse_cursor_tex);
+	m_hge->Texture_Free(m_background_quad.tex);
 
-    // Clean up and shutdown
-    m_hge->System_Shutdown();
-    m_hge->Release();
+	// Clean up and shutdown
+	m_hge->System_Shutdown();
+	m_hge->Release();
 }
 
 

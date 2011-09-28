@@ -28,6 +28,22 @@ const char * _page2_text[] = {
 	"between the end of screen and the wall, you will die.",
 	NULL
 };
+// array of strings of unknown length (NULL marks the end)
+// You may delete few lines or add new lines before NULL if screen height allows.
+const char * _credits_text[] = {
+	"This brilliant masterpiece",
+	"was brought to you by",
+	"",
+	"big boss Haaf, the master and",
+	"the maker of HGE Engine",
+	"",
+	"and your humble slave, kvakvs,",
+	"who made this ugly game",
+	"",
+	"tremble, mortals, before it",
+	"and feel free to edit to your liking",
+	NULL
+};
 
 // This should render main menu
 void GameState_MainMenu::Render( MyGame * game )
@@ -151,9 +167,9 @@ void GameState_Instructions::Render( MyGame * game )
     m_gui->Render();
 
 	// as we are not using GUI in this state, we have to draw cursor ourself
-	float mx, my;
-	game->m_hge->Input_GetMousePos( & mx, & my );
-	game->m_mouse_cursor_sprite->Render( mx, my );
+	//float mx, my;
+	//game->m_hge->Input_GetMousePos( & mx, & my );
+	//game->m_mouse_cursor_sprite->Render( mx, my );
 }
 
 
@@ -238,7 +254,6 @@ void GameState_Instructions::PopulateInstructionsPage( MyGame * game, const char
 		hgeGUIText * c1 = new hgeGUIText(100+textrow, 0, 150.0f+40.0f*textrow, 800, 40, game->m_font);
 		c1->SetMode( HGETEXT_CENTER );
 		c1->SetText( text[textrow] );
-		//c1->bVisible = true;
 		m_gui->AddCtrl(c1);
 	}
 }
@@ -248,3 +263,114 @@ GameState_Instructions::~GameState_Instructions()
 	delete m_gui;
 }
 
+
+GameState_Credits::GameState_Credits( MyGame * game )
+{
+    // Create and initialize the GUI
+    m_gui = new hgeGUI();
+    m_gui->AddCtrl(new hgeGUIMenuItem(CREDITS_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.4f,"Done"));
+
+	m_draw_credits_y = 600; // bottom of screen, will decrease to slide up
+	//PopulateCredits( game );
+	
+    //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetCursor( game->m_mouse_cursor_sprite );
+    //m_gui->SetFocus(1);
+    m_gui->Enter();
+}
+
+GameState_Credits::~GameState_Credits()
+{
+	delete m_gui;
+}
+
+
+/*
+void GameState_Credits::PopulateCredits( MyGame * game )
+{
+	m_credits_row_count = 0;
+
+	// for each row in credits text
+	for( int textrow = 0; _credits_text[textrow]; textrow++ )
+	{
+		// attempt to retrieve and delete old text control
+		if (m_gui->GetCtrl( 100+textrow )) {
+			m_gui->DelCtrl( 100+textrow );
+		}
+
+		// add new text control with line from instructions
+		// starting from under bottom of screen (600) and going deeper
+		hgeGUIText * c1 = new hgeGUIText(100+textrow,
+							0, 600.0f + 40.0f*textrow,
+							800, 40, game->m_font);
+
+		c1->SetMode( HGETEXT_CENTER );
+		c1->SetText( _credits_text[textrow] );
+		m_gui->AddCtrl(c1);
+		m_credits_row_count++;
+	}
+}
+*/
+
+
+void GameState_Credits::Render( MyGame * game )
+{
+    game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
+    m_gui->Render();
+
+	game->m_font->SetColor(0xFFFFFFFF);
+	for( int textrow = 0; _credits_text[textrow]; textrow++ )
+	{
+		game->m_font->printf( 400, m_draw_credits_y + CREDITS_ROW_HEIGHT * textrow,
+				HGETEXT_CENTER, _credits_text[textrow] );
+	}
+}
+
+
+bool GameState_Credits::Think( MyGame * game )
+{
+	float dt = game->m_hge->Timer_GetDelta();
+    int id;
+    static int lastid = CREDITS_ELEMENT_NONE_SELECTED;
+
+    // If ESCAPE was pressed, tell the GUI to finish
+    if (game->m_hge->Input_GetKeyState(HGEK_ESCAPE)) {
+		lastid = CREDITS_ELEMENT_EXIT;
+		m_gui->Leave();
+	}
+    
+    // We update the GUI and take an action if
+    // one of the menu items was selected
+    id = m_gui->Update(dt);
+    if(id == -1)
+    {
+        switch(lastid)
+        {
+            case CREDITS_ELEMENT_EXIT:
+				game->ShowMainMenuScreen();
+				m_gui->SetFocus(CREDITS_ELEMENT_EXIT);
+                m_gui->Enter();
+                break;
+        }
+    } else if(id) {
+        lastid = id;
+		m_gui->Leave();
+    }
+
+	AnimateBackground( dt, game );
+
+	// slide credits up
+/*
+	for( int i = 100; i < 100+m_credits_row_count; i++ )
+	{
+		hgeGUIText * t = (hgeGUIText *)m_gui->GetCtrl( i );
+		if( ! t ) continue;
+
+		m_gui->MoveCtrl( i, 0, 0 ); // t->rect.x1, t->rect.y1 - dt * 20.0f );
+	}
+*/
+	// this is rough speed estimation, should be properly reworked with millisecond timer
+	m_draw_credits_y -= dt * CREDITS_SPEED;
+
+	return false;
+}

@@ -56,8 +56,6 @@ public:
 class GameState_Instructions: public virtual GameState
 {
 protected:
-	// Instructions pages 1 and 2 (we will move elements to slide into the view
-	// when user changes pages)
 	hgeGUI		* m_gui;
 
 public:
@@ -82,9 +80,31 @@ public:
 // This game state represents instructions screen and only draws text until click or key pressed
 class GameState_Credits: public virtual GameState
 {
+protected:
+	hgeGUI		* m_gui;
+	//int m_credits_row_count;
+
+	// vertical coord to render credits, slowly decreases to show all text into screen
+	float		m_draw_credits_y;
+
 public:
-	void Render( MyGame * game ) {}
-	bool Think( MyGame * game ) { return false; }
+	GameState_Credits( MyGame * game );
+	virtual ~GameState_Credits();
+
+	const static int CREDITS_ROW_HEIGHT = 40;	// row height (distance between rows) in pixels
+	const static int CREDITS_SPEED = 25;		// pixels per second (roughly, bad estimation)
+
+	enum {
+		CREDITS_ELEMENT_NONE_SELECTED = 0,
+		CREDITS_ELEMENT_EXIT = 1
+	};
+
+	// fills m_gui with text labels containing lines of credits
+	// (Called once)
+	//void PopulateCredits( MyGame * game );
+
+	void Render( MyGame * game );
+	bool Think( MyGame * game );
 };
 
 
