@@ -21,7 +21,7 @@ add_definitions( "-D_CRT_SECURE_NO_WARNINGS" "-D_CRT_NONSTDC_NO_WARNINGS" "-D_SC
 
 #------ sources ------
 set( HGESKEL_SRC
-    src/main.cpp
+    src/game.cpp        src/game.h
     src/menuitem.cpp    src/menuitem.h
     src/player.cpp      src/player.h
     src/world.cpp       src/world.h
