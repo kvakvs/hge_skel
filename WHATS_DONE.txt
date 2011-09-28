@@ -1,0 +1,20 @@
+What we have now:
+
+* MyGame class - all the static stuff from hgetut06 moved inside it.
+
+* GameState class. Its a piece of code which handles drawing and input, and can
+be switched on the fly when user changes game mode (like clicks options or
+instructions or starts a game).
+
+* GameState for Main Menu, MainMenu GUI from hgetut06 moved to this GameState, as
+it belongs to main menu only and never pops up anywhere later until we return to
+main menu.
+
+* GameState for Instructions - 2 page instructions with menu items to switch
+between them and return to main menu. It has separate HGE GUI for displaying
+text labels with instructions (configurable on top of game_state.cpp) and
+switching between pages.
+
+* Some variables were renamed on the way, to more recognizable (like global
+HTEXTURE tex was moved inside MyGame class and renamed to m_mouse_cursor_tex)
+you should get the idea.
