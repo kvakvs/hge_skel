@@ -3,85 +3,40 @@
 ** Haaf's Game Engine 1.8 -- Copyright (C) 2003-2007, Relish Games http://hge.relishgames.com
 ** Reworked by Dmytro Lytovchenko kvakvs@yandex.ru https://github.com/kvakvs/hge_skel
 */
-
-
 // Copy the files "menu.wav", "font1.fnt", "font1.png",
 // "bg.png" and "cursor.png" from the folder "precompiled"
 // to the folder with executable file. Also copy hge.dll
 // and bass.dll to the same folder.
 
-#include "game.h"
+
 #include "menuitem.h"
+#include "game.h"
+#include "game_state.h"
 
-#include <math.h>
+MyGame * MyGame::m_game = NULL;
 
-// for the class definition check "game.h" file
-HGE *       MyGame::hge = NULL;
-HEFFECT     MyGame::snd;
-HTEXTURE    MyGame::tex;
-hgeQuad     MyGame::quad;
-hgeGUI *    MyGame::gui = NULL;
-hgeFont *   MyGame::fnt = NULL;
-hgeSprite * MyGame::spr = NULL;
+
+MyGame::MyGame() : hge(NULL), gui(NULL), fnt(NULL), spr(NULL)
+{
+	// remember pointer to 'this' in globally visible variable so that everyone
+	// else can reach it (not very good example of software design, but this simplifies a lot)
+	m_game = this;
+
+	m_state = new GameState_MainMenu();
+}
 
 
 bool MyGame::FrameFunc()
 {
-    float dt=hge->Timer_GetDelta();
-    static float t=0.0f;
-    float tx,ty;
-    int id;
-    static int lastid=0;
-
-    // If ESCAPE was pressed, tell the GUI to finish
-    if(hge->Input_GetKeyState(HGEK_ESCAPE)) { lastid=5; gui->Leave(); }
-    
-    // We update the GUI and take an action if
-    // one of the menu items was selected
-    id=gui->Update(dt);
-    if(id == -1)
-    {
-        switch(lastid)
-        {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                gui->SetFocus(1);
-                gui->Enter();
-                break;
-
-            case 5: return true;
-        }
-    }
-    else if(id) {
-        lastid=id; gui->Leave();
-    }
-
-    // Here we update our background animation
-    t+=dt;
-    tx=50*cosf(t/60);
-    ty=50*sinf(t/60);
-
-    quad.v[0].tx=tx;        quad.v[0].ty=ty;
-    quad.v[1].tx=tx+800/64; quad.v[1].ty=ty;
-    quad.v[2].tx=tx+800/64; quad.v[2].ty=ty+600/64;
-    quad.v[3].tx=tx;        quad.v[3].ty=ty+600/64;
-
-    return false;
+	// passing control to the current game state, so that game reacts to events
+	// differently in different states
+	return m_game->m_state->Think( m_game );	
 }
 
 
 bool MyGame::RenderFunc()
 {
-    // Render graphics
-    hge->Gfx_BeginScene();
-    hge->Gfx_RenderQuad(&quad);
-    gui->Render();
-    fnt->SetColor(0xFFFFFFFF);
-    fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d", hge->Timer_GetDelta(), hge->Timer_GetFPS());
-    hge->Gfx_EndScene();
-
+	m_game->m_state->Render( m_game );
     return false;
 }
 
@@ -169,13 +124,12 @@ void MyGame::Shutdown()
 }
 
 
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
     MyGame game;
     if( game.Startup() )
     {
-        MyGame::hge->System_Start(); // Let's rock now!
+        game.hge->System_Start(); // Let's rock now!
         game.Shutdown();
     }
 }

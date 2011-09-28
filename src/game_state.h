@@ -5,14 +5,28 @@
 // Represents current state of the application - is it in menu screen, or in the
 // game world, or at the game over screen (showing high scores screen).
 
+// telling the compiler that MyGame class exists. Somewhere.
+class MyGame;
+
 class GameState
 {
 public:
     // This is called periodically to draw the main menu, or the world, or the gameover screen
     // Please no logic in this code, only drawing
-    virtual void Render() = 0;
+	// Render returns void. Can't stop the game from here, unlike HGE's renderfunc.
+    virtual void Render( MyGame * game ) = 0;
 
     // This is called periodically to do the thinking (or nothing) and check keyboard etc.
     // Please no drawing in this code, only logic
-    virtual void Think() = 0;
+	// Think returns bool like HGE framefunc does, returning true will stop the game
+    virtual bool Think( MyGame * game ) = 0;
+};
+
+
+// This game state represents main menu and reacts on keypresses like a main menu would
+class GameState_MainMenu: public virtual GameState
+{
+public:
+	void Render( MyGame * game );
+	bool Think( MyGame * game );
 };

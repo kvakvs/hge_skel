@@ -5,25 +5,34 @@
 #include <hgefont.h>
 #include <hgegui.h>
 
+// telling the compiler that GameState class exists. Somewhere.
+class GameState;
+
 //
 // Main application class, does the job to start up the graphics and the game
 //
 class MyGame
 {
 public:
+	static MyGame * m_game;
     // Pointer to the HGE interface.
     // Helper classes require this to work.
-    static HGE * hge;
+    HGE * hge;
 
     // Some resource handles
-    static HEFFECT      snd;
-    static HTEXTURE     tex;
-    static hgeQuad      quad;
+    HEFFECT		snd;
+    HTEXTURE	tex;
+    hgeQuad		quad;
 
     // Pointers to the HGE objects we will use
-    static hgeGUI       * gui;
-    static hgeFont      * fnt;
-    static hgeSprite    * spr;
+    hgeGUI *	gui;
+    hgeFont *	fnt;
+    hgeSprite *	spr;
+
+	GameState *		m_state;
+
+public:
+	MyGame();
 
     static bool FrameFunc();
     static bool RenderFunc();
