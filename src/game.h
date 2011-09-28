@@ -17,19 +17,21 @@ public:
 	static MyGame * m_game;
     // Pointer to the HGE interface.
     // Helper classes require this to work.
-    HGE * hge;
+    HGE * m_hge;
 
     // Some resource handles
-    HEFFECT		snd;
-    HTEXTURE	tex;
-    hgeQuad		quad;
+    HEFFECT		m_click_sound;
+    HTEXTURE	m_menu_tex;
+
+	// menu background quad. As well we can use it for sky during the gameplay
+    hgeQuad		m_background_quad;
 
     // Pointers to the HGE objects we will use
-    hgeGUI *	gui;
-    hgeFont *	fnt;
-    hgeSprite *	spr;
+    hgeGUI *	m_gui;
+    hgeFont *	m_font;
+    hgeSprite *	m_mouse_cursor_sprite;
 
-	GameState *		m_state;
+	GameState *	m_state;
 
 public:
 	MyGame();

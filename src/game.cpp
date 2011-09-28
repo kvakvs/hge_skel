@@ -16,7 +16,7 @@
 MyGame * MyGame::m_game = NULL;
 
 
-MyGame::MyGame() : hge(NULL), gui(NULL), fnt(NULL), spr(NULL)
+MyGame::MyGame() : m_hge(NULL), m_gui(NULL), m_font(NULL), spr(NULL)
 {
 	// remember pointer to 'this' in globally visible variable so that everyone
 	// else can reach it (not very good example of software design, but this simplifies a lot)
@@ -30,80 +30,91 @@ bool MyGame::FrameFunc()
 {
 	// passing control to the current game state, so that game reacts to events
 	// differently in different states
-	return m_game->m_state->Think( m_game );	
+	return m_game->m_state->Think( m_game );
+	// do not add more code here, all the action happens in GameState's child classes
 }
 
 
 bool MyGame::RenderFunc()
 {
+	// letting the current game state to take care of rendering (different render for
+	// main menu, for game, and for game over screen)
 	m_game->m_state->Render( m_game );
+	// do not add more code here, all the action happens in GameState's child classes
     return false;
 }
 
 
 bool MyGame::Startup()
 {
-    hge = hgeCreate(HGE_VERSION);
+    m_hge = hgeCreate(HGE_VERSION);
 
-    hge->System_SetState(HGE_LOGFILE, "hge_tut06.log");
-    hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-    hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-    hge->System_SetState(HGE_TITLE, "HGE Tutorial 06 - Creating menus");
-    hge->System_SetState(HGE_WINDOWED, true);
-    hge->System_SetState(HGE_SCREENWIDTH, 800);
-    hge->System_SetState(HGE_SCREENHEIGHT, 600);
-    hge->System_SetState(HGE_SCREENBPP, 32);
+    m_hge->System_SetState(HGE_LOGFILE, "hgeskel.log");
+    m_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+    m_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+    m_hge->System_SetState(HGE_TITLE, "My Mighty Game of Doom!");
+    m_hge->System_SetState(HGE_WINDOWED, true);
+    m_hge->System_SetState(HGE_SCREENWIDTH, 800);
+    m_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+    m_hge->System_SetState(HGE_SCREENBPP, 32);
 
-    if( !hge->System_Initiate() ) return false;
+    if( !m_hge->System_Initiate() ) return false;
 
     // Load sound and textures
-    quad.tex=hge->Texture_Load("bg.png");
-    tex=hge->Texture_Load("cursor.png");
-    snd=hge->Effect_Load("menu.wav");
-    if(!quad.tex || !tex || !snd)
+    m_background_quad.tex=m_hge->Texture_Load("bg.png");
+    m_menu_tex=m_hge->Texture_Load("cursor.png");
+    m_click_sound=m_hge->Effect_Load("menu.wav");
+    if(!m_background_quad.tex || !m_menu_tex || !m_click_sound)
     {
         // If one of the data files is not found, display
         // an error message and shutdown.
         MessageBox(NULL, "Can't load BG.PNG, CURSOR.PNG or MENU.WAV", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-        hge->System_Shutdown();
-        hge->Release();
+        m_hge->System_Shutdown();
+        m_hge->Release();
         return false;
     }
 
     // Set up the quad we will use for background animation
-    quad.blend=BLEND_ALPHABLEND | BLEND_COLORMUL | BLEND_NOZWRITE;
+    m_background_quad.blend=BLEND_ALPHABLEND | BLEND_COLORMUL | BLEND_NOZWRITE;
 
     for(int i=0;i<4;i++)
     {
         // Set up z-coordinate of vertices
-        quad.v[i].z=0.5f;
+        m_background_quad.v[i].z=0.5f;
         // Set up color. The format of DWORD col is 0xAARRGGBB
-        quad.v[i].col=ARGB(0xFF, 0xFF, 0xFF, 0xFF);
+        m_background_quad.v[i].col=ARGB(0xFF, 0xFF, 0xFF, 0xFF);
     }
 
-    quad.v[0].x=0; quad.v[0].y=0; 
-    quad.v[1].x=800; quad.v[1].y=0; 
-    quad.v[2].x=800; quad.v[2].y=600; 
-    quad.v[3].x=0; quad.v[3].y=600; 
+    m_background_quad.v[0].x=0;
+	m_background_quad.v[0].y=0; 
+
+    m_background_quad.v[1].x=800;
+	m_background_quad.v[1].y=0;
+
+    m_background_quad.v[2].x=800;
+	m_background_quad.v[2].y=600; 
+
+    m_background_quad.v[3].x=0;
+	m_background_quad.v[3].y=600; 
 
 
     // Load the font, create the cursor sprite
-    fnt=new hgeFont("font1.fnt");
-    spr=new hgeSprite(tex,0,0,32,32);
+    m_font=new hgeFont("font1.fnt");
+    spr=new hgeSprite(m_menu_tex,0,0,32,32);
 
     // Create and initialize the GUI
-    gui=new hgeGUI();
+    m_gui=new hgeGUI();
 
-    gui->AddCtrl(new hgeGUIMenuItem(1,fnt,snd,400,200,0.0f,"Play"));
-    gui->AddCtrl(new hgeGUIMenuItem(2,fnt,snd,400,240,0.1f,"Options"));
-    gui->AddCtrl(new hgeGUIMenuItem(3,fnt,snd,400,280,0.2f,"Instructions"));
-    gui->AddCtrl(new hgeGUIMenuItem(4,fnt,snd,400,320,0.3f,"Credits"));
-    gui->AddCtrl(new hgeGUIMenuItem(5,fnt,snd,400,360,0.4f,"Exit"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(1,m_font,m_click_sound,400,200,0.0f,"Play"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(2,m_font,m_click_sound,400,240,0.1f,"Options"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(3,m_font,m_click_sound,400,280,0.2f,"Instructions"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(4,m_font,m_click_sound,400,320,0.3f,"Credits"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(5,m_font,m_click_sound,400,360,0.4f,"Exit"));
 
-    gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
-    gui->SetCursor(spr);
-    gui->SetFocus(1);
-    gui->Enter();
+    m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetCursor(spr);
+    m_gui->SetFocus(1);
+    m_gui->Enter();
 
     return true; // all is fine
 }
@@ -111,16 +122,16 @@ bool MyGame::Startup()
 void MyGame::Shutdown()
 {
     // Delete created objects and free loaded resources
-    delete gui;
-    delete fnt;
+    delete m_gui;
+    delete m_font;
     delete spr;
-    hge->Effect_Free(snd);
-    hge->Texture_Free(tex);
-    hge->Texture_Free(quad.tex);
+    m_hge->Effect_Free(m_click_sound);
+    m_hge->Texture_Free(m_menu_tex);
+    m_hge->Texture_Free(m_background_quad.tex);
 
     // Clean up and shutdown
-    hge->System_Shutdown();
-    hge->Release();
+    m_hge->System_Shutdown();
+    m_hge->Release();
 }
 
 
@@ -129,7 +140,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     MyGame game;
     if( game.Startup() )
     {
-        game.hge->System_Start(); // Let's rock now!
+        game.m_hge->System_Start(); // Let's rock now!
         game.Shutdown();
     }
 }
