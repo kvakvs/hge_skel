@@ -22,8 +22,12 @@ add_definitions( "-D_CRT_SECURE_NO_WARNINGS" "-D_CRT_NONSTDC_NO_WARNINGS" "-D_SC
 #------ sources ------
 set( HGESKEL_SRC
     src/main.cpp
-    src/menuitem.cpp
-    src/menuitem.h )
+    src/menuitem.cpp    src/menuitem.h
+    src/player.cpp      src/player.h
+    src/world.cpp       src/world.h
+    src/creature.cpp    src/creature.h
+    src/projectile.cpp  src/projectile.h
+    )
 
 SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY         ${HGESKEL_SOURCE_DIR}/bin CACHE PATH "Single Directory for all executables." )
 SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${HGESKEL_SOURCE_DIR}/bin CACHE PATH "Single Directory for all executables." )
