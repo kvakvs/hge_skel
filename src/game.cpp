@@ -17,6 +17,7 @@ MyGame * MyGame::m_game = NULL;
 
 MyGame::MyGame()
 	: m_hge(NULL), m_font(NULL), m_mouse_cursor_sprite(NULL), m_state(NULL)
+	, m_sound_enabled(true)
 {
 	// remember pointer to 'this' in globally visible variable so that everyone
 	// else can reach it (not very good example of software design, but this simplifies a lot)
@@ -114,7 +115,7 @@ bool MyGame::Startup()
 	m_font = new hgeFont("font1.fnt");
 	m_mouse_cursor_sprite = new hgeSprite(m_mouse_cursor_tex,0,0,32,32);
 
-	m_state_options = new GameState_Options();
+	m_state_options = new GameState_Options( this );
 	m_state_mainmenu = new GameState_MainMenu( this );
 	m_state_instructions = new GameState_Instructions( this );
 	m_state_credits = new GameState_Credits( this );

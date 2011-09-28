@@ -40,6 +40,9 @@ public:
 	void Render( MyGame * game );
 	bool Think( MyGame * game );
 
+	static const int MAINMENU_TOP_ITEM_Y = 200;
+	static const int MAINMENU_ITEM_HEIGHT = 40;
+
 	// numeric codes for GUI elements
 	enum {
 		MAINMENU_ELEMENT_NONE_SELECTED = 0,
@@ -52,7 +55,7 @@ public:
 };
 
 
-// This game state represents instructions screen and only draws text until click or key pressed
+// This game state represents instructions screen and displays 2 pages of options
 class GameState_Instructions: public virtual GameState
 {
 protected:
@@ -77,7 +80,8 @@ public:
 };
 
 
-// This game state represents instructions screen and only draws text until click or key pressed
+// This game state represents credits screen displaying slowly scrolling credits from
+// outside the bottom of screen
 class GameState_Credits: public virtual GameState
 {
 protected:
@@ -108,10 +112,24 @@ public:
 };
 
 
-// This game state represents instructions screen and only draws text until click or key pressed
+// This game state represents options screen with a single option: Sound, and Exit button
 class GameState_Options: public virtual GameState
 {
+protected:
+	hgeGUI		* m_gui;
 public:
-	void Render( MyGame * game ) {}
-	bool Think( MyGame * game ) { return false; }
+	GameState_Options( MyGame * game );
+	virtual ~GameState_Options();
+
+	static const int OPTIONS_TOP_ITEM_Y = 200;
+	static const int OPTIONS_ITEM_HEIGHT = 40;
+
+	enum {
+		OPTIONS_ELEMENT_NONE_SELECTED = 0,
+		OPTIONS_ELEMENT_SOUND = 1,
+		OPTIONS_ELEMENT_EXIT
+	};
+
+	void Render( MyGame * game );
+	bool Think( MyGame * game );
 };

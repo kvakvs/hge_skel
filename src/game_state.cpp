@@ -9,6 +9,11 @@
 
 #include <math.h>
 
+char * _opt_sound_text[2] = {
+	"Sound: Disabled",
+	"Sound: Enabled"
+};
+
 
 // array of strings of unknown length (NULL marks the end).
 // You may delete few lines or add new lines before NULL if screen height allows.
@@ -19,7 +24,9 @@ const char * _page1_text[] = {
 	"You will have to avoid obstacles, and kill stuff.",
 	NULL
 };
-// array of strings of unknown length (NULL marks the end)
+
+
+// arrayof strings of unknown length (NULL marks the end)
 // You may delete few lines or add new lines before NULL if screen height allows.
 const char * _page2_text[] = {
 	"You can move with A/D/arrows, jump with W or space",
@@ -28,22 +35,25 @@ const char * _page2_text[] = {
 	"between the end of screen and the wall, you will die.",
 	NULL
 };
+
+
 // array of strings of unknown length (NULL marks the end)
 // You may delete few lines or add new lines before NULL if screen height allows.
 const char * _credits_text[] = {
 	"This brilliant masterpiece",
 	"was brought to you by",
-	"",
+	"-",
 	"big boss Haaf, the master and",
 	"the maker of HGE Engine",
-	"",
+	"-",
 	"and your humble slave, kvakvs,",
 	"who made this ugly game",
-	"",
+	"***",
 	"tremble, mortals, before it",
 	"and feel free to edit to your liking",
 	NULL
 };
+
 
 // This should render main menu
 void GameState_MainMenu::Render( MyGame * game )
@@ -100,26 +110,26 @@ bool GameState_MainMenu::Think( MyGame * game )
         switch(lastid)
         {
             case MAINMENU_ELEMENT_PLAY:
-				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
-                m_gui->Enter();
+// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+				m_gui->Enter();
                 break;
             
 			case MAINMENU_ELEMENT_OPTIONS:
 				game->ShowOptionsScreen();
-				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
-                m_gui->Enter();
+// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+				m_gui->Enter();
                 break;
 
 			case MAINMENU_ELEMENT_INSTRUCTIONS:
 				game->ShowInstructionsScreen();
-				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
-                m_gui->Enter();
+// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+				m_gui->Enter();
                 break;
 
 			case MAINMENU_ELEMENT_CREDITS:
    				game->ShowCreditsScreen();
-				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
-                m_gui->Enter();
+// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+				m_gui->Enter();
                 break;
 
             case MAINMENU_ELEMENT_EXIT:
@@ -142,15 +152,20 @@ GameState_MainMenu::GameState_MainMenu( MyGame * game )
     // Create and initialize the GUI
     m_gui = new hgeGUI();
 
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_PLAY, game->m_font, game->m_click_sound,400,200,0.0f,"Play"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_OPTIONS, game->m_font, game->m_click_sound,400,240,0.1f,"Options"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_INSTRUCTIONS, game->m_font, game->m_click_sound,400,280,0.2f,"Instructions"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_CREDITS, game->m_font, game->m_click_sound,400,320,0.3f,"Credits"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_EXIT, game->m_font, game->m_click_sound,400,360,0.4f,"Exit"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_PLAY, game->m_font, game->m_click_sound,
+						400, MAINMENU_TOP_ITEM_Y, 0.0f, "Play"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_OPTIONS, game->m_font, game->m_click_sound,
+						400, MAINMENU_TOP_ITEM_Y+MAINMENU_ITEM_HEIGHT, 0.1f, "Options"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_INSTRUCTIONS, game->m_font, game->m_click_sound,
+						400, MAINMENU_TOP_ITEM_Y+2*MAINMENU_ITEM_HEIGHT, 0.2f, "Instructions"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_CREDITS, game->m_font, game->m_click_sound,
+						400, MAINMENU_TOP_ITEM_Y+3*MAINMENU_ITEM_HEIGHT, 0.3f, "Credits"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_EXIT, game->m_font, game->m_click_sound,
+						400, MAINMENU_TOP_ITEM_Y+4*MAINMENU_ITEM_HEIGHT, 0.4f, "Exit"));
 
     m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
     m_gui->SetCursor( game->m_mouse_cursor_sprite );
-    m_gui->SetFocus(1);
+    m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
     m_gui->Enter();
 }
 
@@ -206,8 +221,8 @@ bool GameState_Instructions::Think( MyGame * game )
 
             case INSTRUC_ELEMENT_EXIT:
 				game->ShowMainMenuScreen();
-				m_gui->SetFocus(INSTRUC_ELEMENT_EXIT);
-                m_gui->Enter();
+// 				m_gui->SetFocus(INSTRUC_ELEMENT_EXIT);
+//				m_gui->Enter();
                 break;
         }
     } else if(id) {
@@ -229,13 +244,13 @@ GameState_Instructions::GameState_Instructions( MyGame * game )
 
     m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_PAGE1, game->m_font, game->m_click_sound,100,550,0.0f,"Page 1"));
     m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_PAGE2, game->m_font, game->m_click_sound,400,550,0.1f,"Page 2"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.4f,"Done"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(INSTRUC_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.2f,"Done"));
 
 	PopulateInstructionsPage( game, _page1_text );
 	
     //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
     m_gui->SetCursor( game->m_mouse_cursor_sprite );
-    //m_gui->SetFocus(1);
+    m_gui->SetFocus(INSTRUC_ELEMENT_PAGE1);
     m_gui->Enter();
 }
 
@@ -268,7 +283,7 @@ GameState_Credits::GameState_Credits( MyGame * game )
 {
     // Create and initialize the GUI
     m_gui = new hgeGUI();
-    m_gui->AddCtrl(new hgeGUIMenuItem(CREDITS_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.4f,"Done"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(CREDITS_ELEMENT_EXIT, game->m_font, game->m_click_sound,700,550,0.0f,"Done"));
 
 	m_draw_credits_y = 600; // bottom of screen, will decrease to slide up
 	//PopulateCredits( game );
@@ -286,6 +301,7 @@ GameState_Credits::~GameState_Credits()
 
 
 /*
+// This shows how to fill array of hgeGUIText's with values
 void GameState_Credits::PopulateCredits( MyGame * game )
 {
 	m_credits_row_count = 0;
@@ -348,7 +364,7 @@ bool GameState_Credits::Think( MyGame * game )
         {
             case CREDITS_ELEMENT_EXIT:
 				game->ShowMainMenuScreen();
-				m_gui->SetFocus(CREDITS_ELEMENT_EXIT);
+				//m_gui->SetFocus(CREDITS_ELEMENT_EXIT);
                 m_gui->Enter();
                 break;
         }
@@ -366,11 +382,87 @@ bool GameState_Credits::Think( MyGame * game )
 		hgeGUIText * t = (hgeGUIText *)m_gui->GetCtrl( i );
 		if( ! t ) continue;
 
-		m_gui->MoveCtrl( i, 0, 0 ); // t->rect.x1, t->rect.y1 - dt * 20.0f );
+		// this one doesn't move anything, at all. Might be my mistake of course.
+		m_gui->MoveCtrl( i, t->rect.x1, t->rect.y1 - dt * 20.0f );
 	}
 */
 	// this is rough speed estimation, should be properly reworked with millisecond timer
 	m_draw_credits_y -= dt * CREDITS_SPEED;
+
+	return false;
+}
+
+
+GameState_Options::GameState_Options( MyGame * game )
+{
+    // Create and initialize the GUI
+    m_gui = new hgeGUI();
+
+    m_gui->AddCtrl(new hgeGUIMenuItem(OPTIONS_ELEMENT_SOUND, game->m_font, game->m_click_sound,
+						400, OPTIONS_TOP_ITEM_Y, 0.0f, _opt_sound_text[game->m_sound_enabled] ));
+    m_gui->AddCtrl(new hgeGUIMenuItem(OPTIONS_ELEMENT_EXIT, game->m_font, game->m_click_sound,
+						400, OPTIONS_TOP_ITEM_Y+OPTIONS_ITEM_HEIGHT, 0.1f, "Exit"));
+
+    //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetCursor( game->m_mouse_cursor_sprite );
+    m_gui->SetFocus( OPTIONS_ELEMENT_SOUND );
+    m_gui->Enter();
+}
+
+
+GameState_Options::~GameState_Options()
+{
+	delete m_gui;
+}
+
+void GameState_Options::Render( MyGame * game )
+{
+    game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
+    m_gui->Render();
+}
+
+bool GameState_Options::Think( MyGame * game )
+{
+	float dt = game->m_hge->Timer_GetDelta();
+    int id;
+    static int lastid = OPTIONS_ELEMENT_NONE_SELECTED;
+
+    // If ESCAPE was pressed, tell the GUI to finish
+    if (game->m_hge->Input_GetKeyState(HGEK_ESCAPE)) {
+		lastid = OPTIONS_ELEMENT_EXIT;
+		m_gui->Leave();
+	}
+    
+    // We update the GUI and take an action if
+    // one of the menu items was selected
+	id = m_gui->Update(dt);
+	if(id == -1)
+	{
+		switch(lastid)
+		{
+		case OPTIONS_ELEMENT_SOUND:
+			game->m_sound_enabled = ! game->m_sound_enabled;
+			
+			// delete and re-add the menu element
+			m_gui->DelCtrl(OPTIONS_ELEMENT_SOUND);
+			m_gui->AddCtrl(new hgeGUIMenuItem(OPTIONS_ELEMENT_SOUND, game->m_font, game->m_click_sound,
+						400, OPTIONS_TOP_ITEM_Y, 0.0f, _opt_sound_text[game->m_sound_enabled] ));
+
+			m_gui->SetFocus( OPTIONS_ELEMENT_SOUND );
+			m_gui->Enter();
+			break;
+
+		case OPTIONS_ELEMENT_EXIT:
+			game->ShowMainMenuScreen();
+			m_gui->Enter();
+			break;
+		}
+	} else if(id) {
+		lastid = id;
+		m_gui->Leave();
+	}
+
+	AnimateBackground( dt, game );
 
 	return false;
 }

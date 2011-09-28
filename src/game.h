@@ -20,6 +20,9 @@ public:
 	// Pointer to the HGE interface.
     HGE * m_hge;
 
+	// flag set to 0 or 1 to enable sound effects
+	int m_sound_enabled;
+
     // Some resource handles
     HEFFECT		m_click_sound;
     HTEXTURE	m_mouse_cursor_tex;
