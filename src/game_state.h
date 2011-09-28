@@ -30,3 +30,30 @@ public:
 	void Render( MyGame * game );
 	bool Think( MyGame * game );
 };
+
+
+// This game state represents instructions screen and only draws text until click or key pressed
+class GameState_Instructions: public virtual GameState
+{
+public:
+	void Render( MyGame * game );
+	bool Think( MyGame * game );
+};
+
+
+// This game state represents instructions screen and only draws text until click or key pressed
+class GameState_Credits: public virtual GameState
+{
+public:
+	void Render( MyGame * game ) {}
+	bool Think( MyGame * game ) { return false; }
+};
+
+
+// This game state represents instructions screen and only draws text until click or key pressed
+class GameState_Options: public virtual GameState
+{
+public:
+	void Render( MyGame * game ) {}
+	bool Think( MyGame * game ) { return false; }
+};

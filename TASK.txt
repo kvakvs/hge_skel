@@ -1,0 +1,62 @@
+hge_tut06 GUI options function as their text describes:
+
+* Play; Enters the game at level 1
+* Options; Allows the sound effects to be turned on/off via some method,
+    preferably a click box (Suggestion: sets global boolean to false, and all
+    subsequent sound effects perform a check on this bollean before playing?)
+    Must offer some methos to return to main menu
+* Instructions; Displays some placeholder text, over two pages, with a next
+    and previous button to go tot he next page of instructions (must offer some
+    method of returning to main menu).
+* Credits; Displays placeholder scrolling text from bottom to top.
+* Exit remains the same
+
+When level 1 is entered, the background must change (any place holder image will
+suffice).
+
+Player's character must be created in the middle of the screen on the x axis,
+but resting on the y axis.
+
+The screen must then scrolling forcably scroll from right to left, with
+boundaries so that the players character will be dragged along if they do not
+move.
+
+Function must be written to end the level, with two arguments: Level_Ended(bool
+passed, int next_level); The function must then do the following:
+
+Code:
+
+if (passed == false)
+{
+   //nothing, I will write this code
+}
+else
+{
+   //write the code to clean up the current level, releasing the resources etc
+   //Write code to start level 2 (level 2 should be the same as level 1, but different background)
+}
+
+int level; should be a global variable.
+
+I would also like a placeholder character sprite created (any placeholder will
+do really, as long as it demostrates it is working)
+
+I also want a player class written (and used for the character that is spawned),
+that handles (left arrow || w) walk left, (right arrow|| d) walk right, (space
+bar|| w) makes them jump (respecting their direction, so the jump is not
+staticically vertical unless they are stationary), and left mouse click fires
+some placeholder projectile sprite.
+
+It should also detect collision so as to kill it, and handle the killed event by
+simply moving the player's character back at the starting position, to give the
+illusion of death.
+
+Conditions:
+
+* hge_tut06 must be the basis of the changes.
+* It must be performed by modifying hge_tut06 only, not by making changes to hge itself.
+* Source must be free to use for any reason.
+* Source can be recycled from previous projects, or someone else's work, permission to do so pending.
+* Must be delivered by Oct5th, but earlier is much preferred.
+* Code must function as described, and be written so as to perform as best it might.
+* I would not object to the code being made public, I would in fact encourage it.

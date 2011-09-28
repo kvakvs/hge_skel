@@ -16,13 +16,18 @@
 MyGame * MyGame::m_game = NULL;
 
 
-MyGame::MyGame() : m_hge(NULL), m_gui(NULL), m_font(NULL), spr(NULL)
+MyGame::MyGame()
+	: m_hge(NULL), m_gui(NULL), m_font(NULL), m_mouse_cursor_sprite(NULL), m_state(NULL)
 {
 	// remember pointer to 'this' in globally visible variable so that everyone
 	// else can reach it (not very good example of software design, but this simplifies a lot)
 	m_game = this;
+	m_state_options = new GameState_Options();
+	m_state_mainmenu = new GameState_MainMenu();
+	m_state_instructions = new GameState_Instructions();
+	m_state_credits = new GameState_Credits();
 
-	m_state = new GameState_MainMenu();
+	ShowMainMenuScreen();	
 }
 
 
@@ -61,10 +66,11 @@ bool MyGame::Startup()
     if( !m_hge->System_Initiate() ) return false;
 
     // Load sound and textures
-    m_background_quad.tex=m_hge->Texture_Load("bg.png");
-    m_menu_tex=m_hge->Texture_Load("cursor.png");
-    m_click_sound=m_hge->Effect_Load("menu.wav");
-    if(!m_background_quad.tex || !m_menu_tex || !m_click_sound)
+    m_background_quad.tex = m_hge->Texture_Load("bg.png");
+    m_mouse_cursor_tex = m_hge->Texture_Load("cursor.png");
+    m_click_sound = m_hge->Effect_Load("menu.wav");
+
+    if(!m_background_quad.tex || !m_mouse_cursor_tex || !m_click_sound)
     {
         // If one of the data files is not found, display
         // an error message and shutdown.
@@ -99,39 +105,70 @@ bool MyGame::Startup()
 
 
     // Load the font, create the cursor sprite
-    m_font=new hgeFont("font1.fnt");
-    spr=new hgeSprite(m_menu_tex,0,0,32,32);
+    m_font = new hgeFont("font1.fnt");
+    m_mouse_cursor_sprite = new hgeSprite(m_mouse_cursor_tex,0,0,32,32);
 
     // Create and initialize the GUI
     m_gui=new hgeGUI();
 
-    m_gui->AddCtrl(new hgeGUIMenuItem(1,m_font,m_click_sound,400,200,0.0f,"Play"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(2,m_font,m_click_sound,400,240,0.1f,"Options"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(3,m_font,m_click_sound,400,280,0.2f,"Instructions"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(4,m_font,m_click_sound,400,320,0.3f,"Credits"));
-    m_gui->AddCtrl(new hgeGUIMenuItem(5,m_font,m_click_sound,400,360,0.4f,"Exit"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_PLAY,m_font,m_click_sound,400,200,0.0f,"Play"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_OPTIONS,m_font,m_click_sound,400,240,0.1f,"Options"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_INSTRUCTIONS,m_font,m_click_sound,400,280,0.2f,"Instructions"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_CREDITS,m_font,m_click_sound,400,320,0.3f,"Credits"));
+    m_gui->AddCtrl(new hgeGUIMenuItem(MAINMENU_ELEMENT_EXIT,m_font,m_click_sound,400,360,0.4f,"Exit"));
 
     m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
-    m_gui->SetCursor(spr);
+    m_gui->SetCursor(m_mouse_cursor_sprite);
     m_gui->SetFocus(1);
     m_gui->Enter();
 
     return true; // all is fine
 }
 
+
 void MyGame::Shutdown()
 {
     // Delete created objects and free loaded resources
     delete m_gui;
     delete m_font;
-    delete spr;
-    m_hge->Effect_Free(m_click_sound);
-    m_hge->Texture_Free(m_menu_tex);
+    delete m_mouse_cursor_sprite;
+
+	m_hge->Effect_Free(m_click_sound);
+    m_hge->Texture_Free(m_mouse_cursor_tex);
     m_hge->Texture_Free(m_background_quad.tex);
 
     // Clean up and shutdown
     m_hge->System_Shutdown();
     m_hge->Release();
+
+	delete m_state_options;
+	delete m_state_mainmenu;
+	delete m_state_instructions;
+	delete m_state_credits;
+}
+
+
+void MyGame::ShowMainMenuScreen()
+{
+	m_state = m_state_mainmenu;
+}
+
+
+void MyGame::ShowOptionsScreen()
+{
+	m_state = m_state_options;
+}
+
+
+void MyGame::ShowInstructionsScreen()
+{
+	m_state = m_state_instructions;
+}
+
+
+void MyGame::ShowCreditsScreen()
+{
+	m_state = m_state_credits;
 }
 
 
