@@ -181,10 +181,8 @@ void GameState_Instructions::Render( MyGame * game )
     game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
     m_gui->Render();
 
-	// as we are not using GUI in this state, we have to draw cursor ourself
-	//float mx, my;
-	//game->m_hge->Input_GetMousePos( & mx, & my );
-	//game->m_mouse_cursor_sprite->Render( mx, my );
+	// we are using GUI in this state, so it will draw the mouse cursor itself
+	// no need to bother
 }
 
 
@@ -248,7 +246,7 @@ GameState_Instructions::GameState_Instructions( MyGame * game )
 
 	PopulateInstructionsPage( game, _page1_text );
 	
-    //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetNavMode(HGEGUI_LEFTRIGHT | HGEGUI_CYCLED);
     m_gui->SetCursor( game->m_mouse_cursor_sprite );
     m_gui->SetFocus(INSTRUC_ELEMENT_PAGE1);
     m_gui->Enter();
@@ -340,6 +338,9 @@ void GameState_Credits::Render( MyGame * game )
 		game->m_font->printf( 400, m_draw_credits_y + CREDITS_ROW_HEIGHT * textrow,
 				HGETEXT_CENTER, _credits_text[textrow] );
 	}
+
+	// we are using GUI in this state, so it will draw the mouse cursor itself
+	// no need to bother
 }
 
 
@@ -403,7 +404,7 @@ GameState_Options::GameState_Options( MyGame * game )
     m_gui->AddCtrl(new hgeGUIMenuItem(OPTIONS_ELEMENT_EXIT, game->m_font, game->m_click_sound,
 						400, OPTIONS_TOP_ITEM_Y+OPTIONS_ITEM_HEIGHT, 0.1f, "Exit"));
 
-    //m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+    m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
     m_gui->SetCursor( game->m_mouse_cursor_sprite );
     m_gui->SetFocus( OPTIONS_ELEMENT_SOUND );
     m_gui->Enter();
@@ -415,11 +416,15 @@ GameState_Options::~GameState_Options()
 	delete m_gui;
 }
 
+
 void GameState_Options::Render( MyGame * game )
 {
     game->m_hge->Gfx_RenderQuad( &game->m_background_quad );
     m_gui->Render();
+	// we are using GUI in this state, so it will draw the mouse cursor itself
+	// no need to bother
 }
+
 
 bool GameState_Options::Think( MyGame * game )
 {
@@ -466,3 +471,9 @@ bool GameState_Options::Think( MyGame * game )
 
 	return false;
 }
+
+
+	// as we are not using GUI in this state, we have to draw cursor ourself
+	//float mx, my;
+	//game->m_hge->Input_GetMousePos( & mx, & my );
+	//game->m_mouse_cursor_sprite->Render( mx, my );
