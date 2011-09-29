@@ -119,6 +119,7 @@ bool MyGame::Startup()
 	m_state_mainmenu = new GameState_MainMenu( this );
 	m_state_instructions = new GameState_Instructions( this );
 	m_state_credits = new GameState_Credits( this );
+	m_state_play = new GameState_Play();
 
 	ShowMainMenuScreen();	
 
@@ -132,6 +133,7 @@ void MyGame::Shutdown()
 	delete m_state_mainmenu;
 	delete m_state_instructions;
 	delete m_state_credits;
+	delete m_state_play;
 
 	// Delete created objects and free loaded resources
 	delete m_font;
@@ -168,6 +170,13 @@ void MyGame::ShowInstructionsScreen()
 void MyGame::ShowCreditsScreen()
 {
 	m_state = m_state_credits;
+}
+
+
+void MyGame::ShowPlayScreen()
+{
+	m_state = m_state_play;
+	m_state_play->OnEnterState( this );
 }
 
 

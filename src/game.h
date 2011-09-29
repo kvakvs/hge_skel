@@ -1,6 +1,9 @@
 // to prevent multiple compiling of this header
 #pragma once
 
+// this is for standard integer types like uint32_t (very useful)
+#include <stdint.h>
+
 #include <hge.h>
 #include <hgefont.h>
 
@@ -41,10 +44,11 @@ public:
 	// premade game states to change to. Since its bad idea to delete them on the
 	// fly while state change code is called from the running game state, we just
 	// premake states and store them here.
-	GameState *	m_state_options;
-	GameState *	m_state_mainmenu;
-	GameState *	m_state_instructions;
-	GameState *	m_state_credits;
+	GameState *	m_state_options;		// shows options menu
+	GameState *	m_state_mainmenu;		// shows main menu
+	GameState *	m_state_instructions;	// shows 2 pages of instructions
+	GameState *	m_state_credits;		// shows scrolling credits text
+	GameState *	m_state_play;			// shows game world and allows to play
 
 
 public:
@@ -65,4 +69,5 @@ public:
 	void ShowOptionsScreen();
 	void ShowInstructionsScreen();
 	void ShowCreditsScreen();
+	void ShowPlayScreen();
 };

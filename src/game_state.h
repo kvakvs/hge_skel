@@ -24,6 +24,11 @@ public:
     // Please no drawing in this code, only logic
 	// Think returns bool like HGE framefunc does, returning true will stop the game
     virtual bool Think( MyGame * game ) = 0;
+	
+	// This is called when mygame enters the state. Not used anywhere except the GameState_Play
+	// class, where it is used to reset game to level 1
+	// (initial lives count and reset the score, stuff like that)
+	void OnEnterState( MyGame * game ) {}
 };
 
 
@@ -132,4 +137,26 @@ public:
 
 	void Render( MyGame * game );
 	bool Think( MyGame * game );
+};
+
+
+class World;
+class Player;
+
+// This state is activated when player starts the game
+class GameState_Play: virtual public GameState
+{
+protected:
+	// We create and load world using this class. World is responsible for its
+	// playing rules. World defines conditions when player wins.
+	World * m_world;
+	Player * m_player;
+
+public:
+	GameState_Play();
+	virtual ~GameState_Play();
+
+    virtual void Render( MyGame * game );
+    virtual bool Think( MyGame * game );
+	void OnEnterState( MyGame * game );
 };

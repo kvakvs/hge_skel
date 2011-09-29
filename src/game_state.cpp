@@ -4,6 +4,8 @@
 #include "game_state.h"
 #include "game.h"
 #include "menuitem.h"
+#include "world.h"
+#include "player.h"
 
 #include <hgeguictrls.h>
 
@@ -110,25 +112,22 @@ bool GameState_MainMenu::Think( MyGame * game )
         switch(lastid)
         {
             case MAINMENU_ELEMENT_PLAY:
-// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
+				game->ShowPlayScreen();
 				m_gui->Enter();
                 break;
             
 			case MAINMENU_ELEMENT_OPTIONS:
 				game->ShowOptionsScreen();
-// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
 				m_gui->Enter();
                 break;
 
 			case MAINMENU_ELEMENT_INSTRUCTIONS:
 				game->ShowInstructionsScreen();
-// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
 				m_gui->Enter();
                 break;
 
 			case MAINMENU_ELEMENT_CREDITS:
    				game->ShowCreditsScreen();
-// 				m_gui->SetFocus(MAINMENU_ELEMENT_PLAY);
 				m_gui->Enter();
                 break;
 
@@ -473,7 +472,46 @@ bool GameState_Options::Think( MyGame * game )
 }
 
 
+void GameState_Play::Render( MyGame * game )
+{
 	// as we are not using GUI in this state, we have to draw cursor ourself
-	//float mx, my;
-	//game->m_hge->Input_GetMousePos( & mx, & my );
-	//game->m_mouse_cursor_sprite->Render( mx, my );
+	float mx, my;
+	game->m_hge->Input_GetMousePos( & mx, & my );
+	game->m_mouse_cursor_sprite->Render( mx, my );
+}
+
+
+bool GameState_Play::Think( MyGame * game )
+{
+	// give the World a chance to play its internal logic, like move monsters and animate things
+	m_world->Think();
+
+	// TODO: Design a way to return events from the World::Think, like inform about player taking damage/dying
+
+	if( m_world->Victory() ) {
+	}
+
+	return false;
+}
+
+
+void GameState_Play::OnEnterState( MyGame * game )
+{
+	delete m_player;
+	delete m_world;
+	m_player = new Player();
+	m_world = new World( m_player, "level_01.txt" );
+}
+
+
+GameState_Play::GameState_Play()
+	: m_world(NULL), m_player(NULL)
+{
+}
+
+
+GameState_Play::~GameState_Play()
+{
+	delete m_world;
+	delete m_player;
+}
