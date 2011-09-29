@@ -15,15 +15,15 @@ class GameState
 public:
 	virtual ~GameState() {}
 
-    // This is called periodically to draw the main menu, or the world, or the gameover screen
-    // Please no logic in this code, only drawing
+	// This is called periodically to draw the main menu, or the world, or the gameover screen
+	// Please no logic in this code, only drawing
 	// Render returns void. Can't stop the game from here, unlike HGE's renderfunc.
-    virtual void Render( MyGame * game ) = 0;
+	virtual void Render( MyGame * game ) = 0;
 
-    // This is called periodically to do the thinking (or nothing) and check keyboard etc.
-    // Please no drawing in this code, only logic
+	// This is called periodically to do the thinking (or nothing) and check keyboard etc.
+	// Please no drawing in this code, only logic
 	// Think returns bool like HGE framefunc does, returning true will stop the game
-    virtual bool Think( MyGame * game ) = 0;
+	virtual bool Think( MyGame * game ) = 0;
 	
 	// This is called when mygame enters the state. Not used anywhere except the GameState_Play
 	// class, where it is used to reset game to level 1
@@ -156,7 +156,7 @@ public:
 	GameState_Play();
 	virtual ~GameState_Play();
 
-    virtual void Render( MyGame * game );
-    virtual bool Think( MyGame * game );
+	virtual void Render( MyGame * game );
+	virtual bool Think( MyGame * game );
 	void OnEnterState( MyGame * game );
 };

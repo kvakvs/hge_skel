@@ -39,6 +39,24 @@ protected:
 	uint32_t m_world_width;
 	uint32_t m_world_height;
 
+	// world visible height will be 9 rows
+	// roughly 600 pixels screen height divided by 64 pix cell size
+	// this can be actually more than 9 if your game can also scroll vertically, but you
+	// will be able to draw only currently visible 9 rows, but this also will require
+	// writing code to auto detect map height in the input file
+	static const int WORLD_HEIGHT = 9;
+
+	// this also delimits max world width in cells, increase if your world grows wider
+	// actual world will be as wide as the widest line in your level file
+	static const int MAX_WORLD_WIDTH = 4096;
+
+	// characters used in map file to represent various world cells
+	enum {
+		WORLD_CELL_EMPTY = ' ',
+		WORLD_CELL_SOLID = '#',
+		WORLD_CELL_MONEY = '$'
+	};
+
 public:
 	// Loads the default world from the filename provided
 	World( Player * plr, const std::string & filename );
