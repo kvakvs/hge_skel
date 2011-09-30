@@ -6,6 +6,7 @@
 #include <list>
 
 #include <hge.h>
+#include <hgerect.h>
 #include <hgevector.h>
 
 // this is for standard integer types like uint32_t (very useful)
@@ -51,9 +52,6 @@ protected:
 
 	HGE * m_hge;
 
-	// is the game running or paused (pause to animate player death for example)
-	bool m_pause_flag;
-
 	// this also delimits max world width in cells, increase if your world grows wider
 	// actual world will be as wide as the widest line in your level file
 	// -- this const contains no secret, moving it to public section
@@ -64,6 +62,9 @@ protected:
 	object_list_t m_objects;
 
 public:
+	// is the game running or paused (pause to animate player death for example)
+	bool m_pause_flag;
+
 	// This stores all loaded textures for the world, including blocks and creatures, but not player
 	SpriteManager m_sprite_manager;
 
@@ -92,7 +93,7 @@ public:
 	enum {
 		WORLD_CELL_EMPTY = ' ',
 		WORLD_CELL_PLAYER_START = '@',
-		WORLD_CELL_SOLID = '#',
+		WORLD_CELL_WALL1 = '#',
 		WORLD_CELL_MONEY = '$'
 	};
 
@@ -118,11 +119,22 @@ public:
 	// fall harder or slower, make it negative to change gravity vector up
 	// This can be modified to return different values depending if player picks up something
 	// or flips a gravity switch (if you wish)
-	virtual float GravityAccel() { return 20.0f; }
+	virtual float GravityAccel() { return 10.0f; }
 
 	// Draws the world in its current state. This function must not call or perform
 	// any other game logic, only drawing
 	virtual void Render();
+
+	// tests if rect rc is allowed to be in the world and does not collide a solid block
+	virtual bool TestBlockCollisionAt( const hgeRect & rc );
+
+	// tests if cell type is solid or pass-through
+	inline bool IsSolidAt( float x, float y ) { 
+		return IsSolid(
+			At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
+			);
+	}
+	virtual bool IsSolid( CellType contents );
 };
 
 

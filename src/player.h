@@ -20,14 +20,36 @@ protected:
 	// You can use acceleration to affect this value when player presses buttons
 	// to simulate inertia. Or you can write exact speeds when player presses buttons
 	// to do instant turns and direction changes.
-	hgeVertex	m_speed;
+	hgeVector	m_speed;
+
+	// pixels per second when player is moving (remember 64 is cell size)
+	static const int BASE_MOVING_SPEED = 120;
 
 	// Hack this value for infinite lives
-	int			m_lives;
+	int		m_lives;
+
+	// world we have entered, must not be NULL when game is active
+	World * m_world;
+
+	enum {
+		FACING_RIGHT = 0,
+		FACING_LEFT = 1
+	};
+
+	// make box slightly smaller for the player
+	//static const int PADDING_LEFT = 12;
+	//static const int PADDING_RIGHT = 12;
+	static const int MAX_FALL_SPEED = 300;
+
+	// set this to 0 to render sprite facing right, 1 to render sprite facing left
+	// used in GetSprite to return the correct facing
+	int		m_last_facing;
 
 	SpriteManager	m_sprite_manager;
 
-	hgeSprite	* m_character_right[2];
+	hgeSprite	* m_character_right[2][2];
+
+	HGE * m_hge;
 
 public:
 	// A bounding box for character sprite used for rendering and collisions
@@ -45,11 +67,13 @@ public:
 	// jumping.
 	// This can be modified to return different values depending if player picks up 
 	// some bonus for higher jumps or eats some weakening mushroom
-	float JumpAccel() {
-		return 50.0f;
+	float JumpSpeed() {
+		return 420.0f;
 	}
 
-	hgeVector GetPos();
+	//hgeVector GetPos();
+	// returns position projected from world to screen coordinates
+	hgeRect GetScreenPosition();
 
 	// this one should reduce lives count
 	virtual void Die();
@@ -61,5 +85,10 @@ public:
 	virtual void Render( World * world );
 
 	// called by gamestate when player enters the world and game begins
-	void EnterWorld( World * w );
+	virtual void EnterWorld( World * w );
+
+	// Here check keyboard
+	virtual void Think();
+
+	void MoveTo( float x, float y );
 };

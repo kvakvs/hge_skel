@@ -107,7 +107,8 @@ void World::Think()
 	m_camera_pos.x += d * 16;
 
 	// test if player was pushed out of screen fully (to be pushed out partially is allowed)
-	if (m_player->GetPos().x < CELL_BOX_SIZE) {
+	if ((m_player->m_position.x2 - m_camera_pos.x) < CELL_BOX_SIZE)
+	{
 		m_player->Die();
 		m_pause_flag = true;
 	}
@@ -148,7 +149,7 @@ void World::Render()
 			CellType cell_contents = this->At( r, c );
 			switch( cell_contents )
 			{
-			case WORLD_CELL_SOLID:
+			case WORLD_CELL_WALL1:
 				// find position in world and render it
 				m_sprite_brick1->Render(
 									c * CELL_BOX_SIZE - m_camera_pos.x,
@@ -165,4 +166,23 @@ void World::Render()
 	{
 		(*i)->Render();
 	}
+}
+
+
+bool World::TestBlockCollisionAt( const hgeRect & rc )
+{
+	// we simplify calculation by only testing 4 corners
+	// using as advantage the fact, that player has same size as world blocks
+	if( IsSolidAt(rc.x1, rc.y1) ) return false;
+	if( IsSolidAt(rc.x1, rc.y2) ) return false;
+	if( IsSolidAt(rc.x2, rc.y1) ) return false;
+	if( IsSolidAt(rc.x2, rc.y2) ) return false;
+
+	return true;
+}
+
+
+bool World::IsSolid( CellType contents )
+{
+	return contents == WORLD_CELL_WALL1;
 }
