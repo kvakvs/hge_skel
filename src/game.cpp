@@ -12,6 +12,8 @@
 #include "game.h"
 #include "game_state.h"
 
+#include <stdio.h>
+
 MyGame * MyGame::m_game = NULL;
 
 
@@ -45,10 +47,15 @@ bool MyGame::RenderFunc()
 	m_game->m_state->Render( m_game );
 
 	// Draw framerate and time since previous frame
-	m_game->m_font->SetColor(0xFFFFFFFF);
-
-	m_game->m_font->printf( 5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d",
-					m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS() );
+	char fps_text[64]; // some safer length so FPS text will fit
+	_snprintf( fps_text, sizeof(fps_text)-1,
+				"dt:%.3f\nFPS:%d",
+				m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS()
+				);
+	m_game->m_font->SetColor(ARGB(255,0,0,0)); // black
+	m_game->m_font->printf( 7, 7, HGETEXT_LEFT, fps_text );
+	m_game->m_font->SetColor(ARGB(255,255,255,255)); // white
+	m_game->m_font->printf( 5, 5, HGETEXT_LEFT, fps_text );
     
 	m_game->m_hge->Gfx_EndScene();
 
@@ -60,6 +67,9 @@ bool MyGame::RenderFunc()
 bool MyGame::Startup()
 {
     m_hge = hgeCreate(HGE_VERSION);
+
+	m_hge->System_SetState(HGE_SHOWSPLASH, false);
+	m_hge->System_SetState(HGE_FPS, 60);
 
     m_hge->System_SetState(HGE_LOGFILE, "hgeskel.log");
     m_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);

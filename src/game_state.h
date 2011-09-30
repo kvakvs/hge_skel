@@ -28,7 +28,7 @@ public:
 	// This is called when mygame enters the state. Not used anywhere except the GameState_Play
 	// class, where it is used to reset game to level 1
 	// (initial lives count and reset the score, stuff like that)
-	void OnEnterState( MyGame * game ) {}
+	virtual void OnEnterState( MyGame * game ) {}
 };
 
 

@@ -3,6 +3,7 @@
 
 #include <hge.h>
 #include <hgerect.h>
+#include <hgevector.h>
 
 // Player class
 // controls keyboard interaction and game rules
@@ -36,4 +37,9 @@ public:
 	float JumpAccel() {
 		return 50.0f;
 	}
+
+	hgeVector GetPos();
+
+	// this one should reduce lives count
+	void Die();
 };

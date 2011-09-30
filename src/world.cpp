@@ -7,11 +7,38 @@
 
 #include <fstream>
 
+#include <hgesprite.h>
+
 
 World::World( Player * plr, const std::string & filename )
 	: m_player(plr), m_world_width(0), m_world_height(0)
+	, m_camera_pos(0, 0), m_pause_flag(false)
 {
 	LoadWorld( filename );
+
+	// this will not create another HGE, instead we will get the global
+	// unique HGE object which is already started
+	m_hge = hgeCreate( HGE_VERSION );
+
+	m_sprite_brick1 = GetSprite("textures/brick1.png");
+	m_sprite_sky = GetSprite("textures/sky1.png");
+}
+
+
+World::~World()
+{
+	delete m_sprite_brick1;
+	delete m_sprite_sky;
+
+	// to free all textures we might have loaded during this world
+	for( string_to_htexture_map_t::iterator iter = m_tex_map.begin();
+		iter != m_tex_map.end();
+		++iter )
+	{
+		m_hge->Texture_Free( iter->second );
+	}
+
+	m_hge->Release();
 }
 
 
@@ -27,7 +54,7 @@ void World::LoadWorld( const std::string & filename )
 	size_t		max_line_width = 0;
 	char		line_buf[MAX_WORLD_WIDTH];
 
-	while( line < WORLD_HEIGHT || f.eof() || f.fail() )
+	while( line < VISIBLE_ROWS || f.eof() || f.fail() )
 	{
 		f.getline( line_buf, sizeof line_buf );
 		size_t line_width = strlen( line_buf );
@@ -40,7 +67,7 @@ void World::LoadWorld( const std::string & filename )
 
 	// this can be actually more than 9 if your game can also scroll vertically
 	// but for now we scroll horizontally only
-	m_world_height = WORLD_HEIGHT;
+	m_world_height = VISIBLE_ROWS;
 	m_world_width = max_line_width;
 	
 	// resize the world
@@ -68,7 +95,16 @@ void World::LoadWorld( const std::string & filename )
 
 void World::Think()
 {
+	if( m_pause_flag ) return;
 
+	float d = m_hge->Timer_GetDelta();
+	m_camera_pos.x += d * 16;
+
+	// test if player was pushed out of screen fully (to be pushed out partially is allowed)
+	if (m_player->GetPos().x < CELL_BOX_SIZE) {
+		m_player->Die();
+		m_pause_flag = true;
+	}
 }
 
 
@@ -77,4 +113,66 @@ World::CellType & World::At( uint32_t row, uint32_t col )
 	_ASSERTE( row >= 0 && row < m_world_height );
 	_ASSERTE( col >= 0 && col < m_world_width );
 	return m_world_cells[ row * m_world_width + col ];
+}
+
+
+void World::Render()
+{
+	// draw the sky, clearing is not needed anymore
+	//m_hge->Gfx_Clear( ARGB(255, 80, 160, 190 ) );
+	m_sprite_sky->Render( 0, 0 );
+
+	// Assume world does not scroll vertically so we render 9 visible rows wholly, 
+	// and carefully calculate visible columns to allow them to seamlessly slide as
+	// the camera moves
+
+	// calculate leftmost visible world column
+	const uint32_t vis_column = (int)m_camera_pos.x / CELL_BOX_SIZE;
+
+	// render one extra column incase if leftmost is partially visible, to avoid gaps
+	// on the right side
+	const uint32_t right_end_column = vis_column + VISIBLE_COLS + 1;
+	
+	for( uint32_t r = 0; r < VISIBLE_ROWS; ++r )
+	{
+		for( uint32_t c = vis_column; c <= right_end_column; ++c )
+		{
+			CellType cell_contents = this->At( r, c );
+			switch( cell_contents )
+			{
+			case WORLD_CELL_SOLID:
+				// find position in world and render it
+				m_sprite_brick1->Render(
+									c * CELL_BOX_SIZE - m_camera_pos.x,
+									r * CELL_BOX_SIZE - m_camera_pos.y
+									);
+				break;
+			} // end switch
+		} // end for columns
+	} // end for rows
+}
+
+
+hgeSprite * World::GetSprite( const std::string & name )
+{
+	// attempt to find the requested texture in cache
+	string_to_htexture_map_t::iterator iter = m_tex_map.find( name );
+	HTEXTURE t = 0;
+
+	if( iter != m_tex_map.end() ) {
+		// use texture from cache
+		t = iter->second;
+	} else {
+		// attempt to load the texture
+		t = m_hge->Texture_Load( name.c_str() );
+	}
+	
+	// if loading failed
+	if( ! t ) return NULL;
+
+	hgeSprite * spr = new hgeSprite(
+							t, 0.0f, 0.0f,
+							(float)m_hge->Texture_GetWidth(t), (float)m_hge->Texture_GetHeight(t)
+							);
+	return spr;
 }

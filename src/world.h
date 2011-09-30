@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
+#include <hge.h>
+#include <hgevector.h>
 
 // this is for standard integer types like uint32_t (very useful)
 #include <stdint.h>
@@ -12,6 +16,7 @@
 #include <crtdbg.h> 
 
 class Player;
+class hgeSprite;
 
 // World class
 // contains the world and its physical rules (collisions, gravity etc)
@@ -39,12 +44,17 @@ protected:
 	uint32_t m_world_width;
 	uint32_t m_world_height;
 
+	// pixel size of world cells
+	static const int CELL_BOX_SIZE = 64;
+
 	// world visible height will be 9 rows
 	// roughly 600 pixels screen height divided by 64 pix cell size
 	// this can be actually more than 9 if your game can also scroll vertically, but you
 	// will be able to draw only currently visible 9 rows, but this also will require
 	// writing code to auto detect map height in the input file
-	static const int WORLD_HEIGHT = 9;
+	static const int VISIBLE_ROWS = 600/CELL_BOX_SIZE;
+
+	static const int VISIBLE_COLS = 800/CELL_BOX_SIZE;
 
 	// this also delimits max world width in cells, increase if your world grows wider
 	// actual world will be as wide as the widest line in your level file
@@ -57,10 +67,28 @@ protected:
 		WORLD_CELL_MONEY = '$'
 	};
 
+	// Textures collection, this will be filled on world loading and freed on world end
+	typedef std::map <std::string, HTEXTURE> string_to_htexture_map_t;
+	string_to_htexture_map_t	m_tex_map;
+
+	// Leaving this as exercise for the reader - to organize sprites better
+	hgeSprite * m_sprite_brick1;
+	hgeSprite * m_sprite_sky;
+
+	HGE * m_hge;
+
+	// This represents camera position, actually this is top-left corner of the visible
+	// window to the game world. Camera slowly moves right increasing X
+	// making the world "slide" left
+	hgeVector m_camera_pos;
+
+	// is the game running or paused (pause to animate player death for example)
+	bool m_pause_flag;
+
 public:
 	// Loads the default world from the filename provided
 	World( Player * plr, const std::string & filename );
-	virtual ~World() {}
+	virtual ~World();
 
 	// Returns a read/writable reference to a world cell. You can read and write to it 
 	// like if it was a real array element
@@ -80,6 +108,12 @@ public:
 	// This can be modified to return different values depending if player picks up something
 	// or flips a gravity switch (if you wish)
 	virtual float GravityAccel() { return 20.0f; }
+
+	// Draws the world in its current state. This function must not call or perform
+	// any other game logic, only drawing
+	virtual void Render();
+
+	hgeSprite * GetSprite( const std::string & name );
 };
 
 

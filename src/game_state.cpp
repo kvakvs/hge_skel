@@ -474,6 +474,8 @@ bool GameState_Options::Think( MyGame * game )
 
 void GameState_Play::Render( MyGame * game )
 {
+	if( m_world ) m_world->Render();
+
 	// as we are not using GUI in this state, we have to draw cursor ourself
 	float mx, my;
 	game->m_hge->Input_GetMousePos( & mx, & my );
