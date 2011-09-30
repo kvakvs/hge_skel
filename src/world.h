@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <list>
 
 #include <hge.h>
 #include <hgevector.h>
@@ -15,8 +15,12 @@
 // showing message box with file and line of the problem (for debugging purposes)
 #include <crtdbg.h> 
 
+#include "sprite_manager.h"
+
 class Player;
 class hgeSprite;
+class WorldObject;
+
 
 // World class
 // contains the world and its physical rules (collisions, gravity etc)
@@ -41,8 +45,33 @@ protected:
 	// by (Row,Col) coord
 	std::vector <CellType> m_world_cells;
 
-	uint32_t m_world_width;
-	uint32_t m_world_height;
+	// Leaving this as exercise for the reader - to organize sprites better
+	hgeSprite * m_sprite_brick1;
+	hgeSprite * m_sprite_sky;
+
+	HGE * m_hge;
+
+	// is the game running or paused (pause to animate player death for example)
+	bool m_pause_flag;
+
+	// this also delimits max world width in cells, increase if your world grows wider
+	// actual world will be as wide as the widest line in your level file
+	// -- this const contains no secret, moving it to public section
+	static const int MAX_WORLD_WIDTH = 4096;
+
+	// this contains creatures and objects and projectiles
+	typedef std::list <WorldObject *> object_list_t;
+	object_list_t m_objects;
+
+public:
+	// This stores all loaded textures for the world, including blocks and creatures, but not player
+	SpriteManager m_sprite_manager;
+
+	// This represents camera position, actually this is top-left corner of the visible
+	// window to the game world. Camera slowly moves right increasing X
+	// making the world "slide" left
+	// -- made this public to access it from the Player when rendering player
+	hgeVector m_camera_pos;
 
 	// pixel size of world cells
 	static const int CELL_BOX_SIZE = 64;
@@ -56,34 +85,16 @@ protected:
 
 	static const int VISIBLE_COLS = 800/CELL_BOX_SIZE;
 
-	// this also delimits max world width in cells, increase if your world grows wider
-	// actual world will be as wide as the widest line in your level file
-	static const int MAX_WORLD_WIDTH = 4096;
+	uint32_t m_world_width;
+	uint32_t m_world_height;
 
 	// characters used in map file to represent various world cells
 	enum {
 		WORLD_CELL_EMPTY = ' ',
+		WORLD_CELL_PLAYER_START = '@',
 		WORLD_CELL_SOLID = '#',
 		WORLD_CELL_MONEY = '$'
 	};
-
-	// Textures collection, this will be filled on world loading and freed on world end
-	typedef std::map <std::string, HTEXTURE> string_to_htexture_map_t;
-	string_to_htexture_map_t	m_tex_map;
-
-	// Leaving this as exercise for the reader - to organize sprites better
-	hgeSprite * m_sprite_brick1;
-	hgeSprite * m_sprite_sky;
-
-	HGE * m_hge;
-
-	// This represents camera position, actually this is top-left corner of the visible
-	// window to the game world. Camera slowly moves right increasing X
-	// making the world "slide" left
-	hgeVector m_camera_pos;
-
-	// is the game running or paused (pause to animate player death for example)
-	bool m_pause_flag;
 
 public:
 	// Loads the default world from the filename provided
@@ -112,8 +123,6 @@ public:
 	// Draws the world in its current state. This function must not call or perform
 	// any other game logic, only drawing
 	virtual void Render();
-
-	hgeSprite * GetSprite( const std::string & name );
 };
 
 

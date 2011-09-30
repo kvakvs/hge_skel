@@ -475,6 +475,7 @@ bool GameState_Options::Think( MyGame * game )
 void GameState_Play::Render( MyGame * game )
 {
 	if( m_world ) m_world->Render();
+	if( m_player ) m_player->Render( m_world );
 
 	// as we are not using GUI in this state, we have to draw cursor ourself
 	float mx, my;
@@ -503,6 +504,8 @@ void GameState_Play::OnEnterState( MyGame * game )
 	delete m_world;
 	m_player = new Player();
 	m_world = new World( m_player, "level_01.txt" );
+	
+	m_player->EnterWorld( m_world );
 }
 
 

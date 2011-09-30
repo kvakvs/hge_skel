@@ -199,3 +199,4 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         game.Shutdown();
     }
 }
+

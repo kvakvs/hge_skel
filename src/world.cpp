@@ -4,6 +4,7 @@
 // class and have e.g. negative gravity, or different set of monsters, or no light, etc.
 #include "world.h"
 #include "player.h"
+#include "creature.h"
 
 #include <fstream>
 
@@ -20,8 +21,8 @@ World::World( Player * plr, const std::string & filename )
 	// unique HGE object which is already started
 	m_hge = hgeCreate( HGE_VERSION );
 
-	m_sprite_brick1 = GetSprite("textures/brick1.png");
-	m_sprite_sky = GetSprite("textures/sky1.png");
+	m_sprite_brick1 = m_sprite_manager.GetSprite("textures/brick1.png");
+	m_sprite_sky = m_sprite_manager.GetSprite("textures/sky1.png");
 }
 
 
@@ -30,13 +31,11 @@ World::~World()
 	delete m_sprite_brick1;
 	delete m_sprite_sky;
 
-	// to free all textures we might have loaded during this world
-	for( string_to_htexture_map_t::iterator iter = m_tex_map.begin();
-		iter != m_tex_map.end();
-		++iter )
-	{
-		m_hge->Texture_Free( iter->second );
+	// clear world contents 
+	for( object_list_t::iterator i = m_objects.begin(); i != m_objects.end(); ++i ) {
+		delete (*i);
 	}
+	m_objects.clear();
 
 	m_hge->Release();
 }
@@ -50,18 +49,18 @@ void World::LoadWorld( const std::string & filename )
 	std::ifstream f;
 	f.open( filename );
 	
-	uint32_t	line = 0;
+	uint32_t	row = 0;
 	size_t		max_line_width = 0;
 	char		line_buf[MAX_WORLD_WIDTH];
 
-	while( line < VISIBLE_ROWS || f.eof() || f.fail() )
+	while( row < VISIBLE_ROWS || f.eof() || f.fail() )
 	{
 		f.getline( line_buf, sizeof line_buf );
 		size_t line_width = strlen( line_buf );
 		if( line_width > max_line_width ) {
 			max_line_width = line_width;
 		}
-		line++;
+		row++;
 	}
 	f.close();
 
@@ -77,17 +76,24 @@ void World::LoadWorld( const std::string & filename )
 	std::fill( m_world_cells.begin(), m_world_cells.end(), WORLD_CELL_EMPTY );
 
 	// Now its time to properly load the world
-	line = 0;
+	row = 0;
 	f.open( filename );
-	while( line < m_world_height || f.eof() || f.fail() )
+	while( row < m_world_height || f.eof() || f.fail() )
 	{
 		f.getline( line_buf, sizeof line_buf );
 		
 		for( int col = 0; line_buf[col]; ++col ) {
-			this->At( line, col ) = line_buf[col];
+			char contents = line_buf[col];
+			if( contents == WORLD_CELL_MONEY ) {
+				WorldObject * o = new WorldObject_Money( this, col * CELL_BOX_SIZE, row * CELL_BOX_SIZE );
+				m_objects.push_back( o );
+			}
+			else {
+				this->At( row, col ) = contents;
+			}
 		}
 
-		line++;
+		row++;
 	}
 	f.close();
 }
@@ -133,6 +139,8 @@ void World::Render()
 	// on the right side
 	const uint32_t right_end_column = vis_column + VISIBLE_COLS + 1;
 	
+
+	// Now draw the visible window into the world
 	for( uint32_t r = 0; r < VISIBLE_ROWS; ++r )
 	{
 		for( uint32_t c = vis_column; c <= right_end_column; ++c )
@@ -150,29 +158,11 @@ void World::Render()
 			} // end switch
 		} // end for columns
 	} // end for rows
-}
 
-
-hgeSprite * World::GetSprite( const std::string & name )
-{
-	// attempt to find the requested texture in cache
-	string_to_htexture_map_t::iterator iter = m_tex_map.find( name );
-	HTEXTURE t = 0;
-
-	if( iter != m_tex_map.end() ) {
-		// use texture from cache
-		t = iter->second;
-	} else {
-		// attempt to load the texture
-		t = m_hge->Texture_Load( name.c_str() );
+	// Now draw creatures and other stuff (no clipping or other optimizations
+	// here we attempt to draw everything)
+	for( object_list_t::iterator i = m_objects.begin(); i != m_objects.end(); ++i )
+	{
+		(*i)->Render();
 	}
-	
-	// if loading failed
-	if( ! t ) return NULL;
-
-	hgeSprite * spr = new hgeSprite(
-							t, 0.0f, 0.0f,
-							(float)m_hge->Texture_GetWidth(t), (float)m_hge->Texture_GetHeight(t)
-							);
-	return spr;
 }

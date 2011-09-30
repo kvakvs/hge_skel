@@ -28,6 +28,7 @@ set( HGESKEL_SRC
     src/world.cpp       src/world.h
     src/creature.cpp    src/creature.h
     src/projectile.cpp  src/projectile.h
+    src/sprite_manager.cpp src/sprite_manager.h
     )
 
 SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY         ${HGESKEL_SOURCE_DIR}/bin CACHE PATH "Single Directory for all executables." )
