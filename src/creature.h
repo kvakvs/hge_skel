@@ -58,6 +58,22 @@ public:
 };
 
 
+class WorldObject_LevelEnd: public virtual WorldObject
+{
+protected:
+    hgeSprite * m_sprite;
+
+public:
+    WorldObject_LevelEnd(World * owner, float x, float y );
+    virtual ~WorldObject_LevelEnd();
+
+	// no animation
+	virtual hgeSprite * GetSprite() { return m_sprite; }
+
+	virtual bool TouchPlayer( Player * pl );
+};
+
+
 class WorldObject_Enemy1: public virtual WorldObject
 {
 protected:

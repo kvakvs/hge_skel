@@ -128,3 +128,21 @@ void WorldObject_Enemy1::Think()
 		}
 	}
 }
+
+bool WorldObject_LevelEnd::TouchPlayer( Player * pl )
+{
+	// here add code for level end
+	m_world->GoalReached();
+	return true;
+}
+
+WorldObject_LevelEnd::WorldObject_LevelEnd( World * owner, float x, float y )
+	: WorldObject( owner,x,y )
+{
+	m_sprite = owner->m_sprite_manager.GetSprite( "textures/goal_princess.png" );
+}
+
+WorldObject_LevelEnd::~WorldObject_LevelEnd()
+{
+	delete m_sprite;
+}

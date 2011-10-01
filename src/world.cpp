@@ -19,7 +19,7 @@
 
 World::World( Player * plr, const std::string & filename )
     : m_player(plr), m_world_width(0), m_world_height(0)
-    , m_camera_pos(0, 0), m_pause_flag(false)
+    , m_camera_pos(0, 0), m_pause_flag(false), m_level_goal_reached(false)
 {
     LoadWorld( filename );
 
@@ -30,11 +30,13 @@ World::World( Player * plr, const std::string & filename )
     m_sprite_brick1 = m_sprite_manager.GetSprite("textures/brick1.png");
     m_sprite_sky = m_sprite_manager.GetSprite("textures/sky1.png");
     m_sprite_spikes = m_sprite_manager.GetSprite("textures/spikes.png");
+	m_sprite_goal = m_sprite_manager.GetSprite("textures/goal_princess.png");
 }
 
 
 World::~World()
 {
+	delete m_sprite_goal;
     delete m_sprite_spikes;
     delete m_sprite_brick1;
     delete m_sprite_sky;
@@ -98,6 +100,10 @@ void World::LoadWorld( const std::string & filename )
             }
             else if( contents == WORLD_CELL_ENEMY1 ) {
                 WorldObject * o = new WorldObject_Enemy1( this, col * CELL_BOX_SIZE, row * CELL_BOX_SIZE );
+                m_objects.push_back( o );
+            }
+			else if( contents == WORLD_CELL_GOAL ) {
+                WorldObject * o = new WorldObject_LevelEnd( this, col * CELL_BOX_SIZE, row * CELL_BOX_SIZE );
                 m_objects.push_back( o );
             }
             else {
@@ -247,4 +253,31 @@ void World::RemoveObject( WorldObject * o )
 			return;
 		}
 	}
+}
+
+
+hgeVector World::FindCellInWorld( CellType celltype )
+{
+    // we need a simple way to determine player starting position
+    // we scan the world for '@' and use that as start
+    for( uint32_t r = 0; r < m_world_height; ++r ) {
+        for( uint32_t c = 0; c < m_world_width; ++c ) {
+            if( this->At(r,c) == celltype ) {
+                return hgeVector( c * CELL_BOX_SIZE, r * CELL_BOX_SIZE );
+            }
+        }
+    }
+
+	return hgeVector(-1, -1);
+}
+
+
+void World::GoalReached()
+{
+	m_level_goal_reached = true;
+}
+
+bool World::Victory()
+{
+	return m_level_goal_reached;
 }

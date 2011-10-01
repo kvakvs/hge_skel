@@ -42,19 +42,14 @@ Player::~Player()
 
 void Player::EnterWorld( World * w )
 {
-    m_world = w;
+	m_world = w;
 
-    // we need a simple way to determine player starting position
-    // we scan the world for '@' and use that as start
-    for( uint32_t r = 0; r < w->m_world_height; ++r ) {
-        for( uint32_t c = 0; c < w->m_world_width; ++c ) {
-            if( w->At(r,c) == World::WORLD_CELL_PLAYER_START )
-            {
-                // found the @ character, set player position
-                MoveTo( c * World::CELL_BOX_SIZE, r * World::CELL_BOX_SIZE );
-            }
-        }
-    }
+	// we need a simple way to determine player starting position
+	// we scan the world for '@' and use that as start
+	hgeVector player_start = w->FindCellInWorld( World::WORLD_CELL_PLAYER_START );
+    
+	// found the @ character, set player position
+	MoveTo( player_start.x, player_start.y );
 }
 
 

@@ -500,6 +500,14 @@ bool GameState_Play::Think( MyGame * game )
     // TODO: Design a way to return events from the World::Think, like inform about player taking damage/dying
 
     if( m_world->Victory() ) {
+		// TODO: Design a intermediate splash screen between levels (like: Level 01 Get ready!)
+		// this should be done using a new GameState_* class
+
+		// for changing level see "OnEnterState()" in this class
+		
+		// for now we just return to main menu
+		game->ShowMainMenuScreen();
+		return false;
     }
 
     return false;

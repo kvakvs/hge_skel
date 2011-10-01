@@ -1,4 +1,6 @@
 .build-*/
-bin/
+*.ilk
+*.log
+*.pdb
 linklib/
 *.log

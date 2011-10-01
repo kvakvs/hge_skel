@@ -58,6 +58,7 @@ protected:
     hgeSprite * m_sprite_brick1;
     hgeSprite * m_sprite_sky;
     hgeSprite * m_sprite_spikes;
+	hgeSprite * m_sprite_goal; // level end
 
     // this also delimits max world width in cells, increase if your world grows wider
     // actual world will be as wide as the widest line in your level file
@@ -70,6 +71,8 @@ protected:
 public:
 	// is the game running or paused (pause to animate player death for example)
     bool m_pause_flag;
+	// marks the victory. If this is set, level should change
+	bool m_level_goal_reached;
 
     HGE * m_hge;
 
@@ -102,12 +105,13 @@ public:
 
     // characters used in map file to represent various world cells
     enum {
-        WORLD_CELL_EMPTY = ' ',
+        WORLD_CELL_EMPTY	= ' ',
         WORLD_CELL_PLAYER_START = '@',
-        WORLD_CELL_WALL1 = '#',
-        WORLD_CELL_MONEY = '$',
-        WORLD_CELL_SPIKES = '^',
-		WORLD_CELL_ENEMY1 = 'A'		// enemy type 1 - edit this to add more enemies
+        WORLD_CELL_WALL1	= '#',
+        WORLD_CELL_MONEY	= '$',
+        WORLD_CELL_SPIKES	= '^',
+		WORLD_CELL_GOAL		= '!',		// a princess or other goal, that marks end of the level
+		WORLD_CELL_ENEMY1	= 'A'		// enemy type 1 - edit this to add more enemies
     };
 
 public:
@@ -117,7 +121,7 @@ public:
 
     // default world can never be "won", you have to inherit the world class
     // and override Victory function to define own rules when player wins
-    virtual bool Victory() { return false; }
+    virtual bool Victory();
 
     // Animates the world, moves monsters, etc.
     virtual void Think();
@@ -176,6 +180,14 @@ public:
 	// Removes given object from the m_objects, make sure you are not iterating over
 	// the m_objects list at this moment, or game will crash
 	void RemoveObject( WorldObject * o );
+
+	// Scans the world searching for value 'c' returns its world coordinates
+	// used to find player starting position and finish cell
+	hgeVector FindCellInWorld( CellType c );
+
+	// This marks end of the level. Inform the calling GameState_Play about level end
+	// and let it delete this world and move to next level
+	virtual void GoalReached();
 };
 
 
