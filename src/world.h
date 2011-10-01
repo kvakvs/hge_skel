@@ -150,6 +150,8 @@ public:
         if( x > m_camera_pos.x + SCREEN_WIDTH ) return WORLD_CELL_WALL1;
         // always not solid below the world
         if( y >= m_world_height * CELL_BOX_SIZE ) return WORLD_CELL_EMPTY;
+		// always not solid above the world
+		if( y < 0 ) return WORLD_CELL_EMPTY;
 
         return At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) );
     }
@@ -163,6 +165,8 @@ public:
         if( x > m_camera_pos.x + SCREEN_WIDTH ) return true;
         // always not solid below the world
         if( y >= m_world_height * CELL_BOX_SIZE ) return false;
+		// always not solid above the world
+		if( y < 0 ) return false;
 
         return IsSolid(
             At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
