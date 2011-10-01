@@ -77,14 +77,17 @@ public:
 	// pixel size of world cells
 	static const int CELL_BOX_SIZE = 64;
 
+	static const int SCREEN_WIDTH = 800;
+	static const int SCREEN_HEIGHT = 600;
+
 	// world visible height will be 9 rows
 	// roughly 600 pixels screen height divided by 64 pix cell size
 	// this can be actually more than 9 if your game can also scroll vertically, but you
 	// will be able to draw only currently visible 9 rows, but this also will require
 	// writing code to auto detect map height in the input file
-	static const int VISIBLE_ROWS = 600/CELL_BOX_SIZE;
+	static const int VISIBLE_ROWS = SCREEN_HEIGHT/CELL_BOX_SIZE;
 
-	static const int VISIBLE_COLS = 800/CELL_BOX_SIZE;
+	static const int VISIBLE_COLS = SCREEN_WIDTH/CELL_BOX_SIZE;
 
 	uint32_t m_world_width;
 	uint32_t m_world_height;
@@ -130,6 +133,9 @@ public:
 
 	// tests if cell type is solid or pass-through
 	inline bool IsSolidAt( float x, float y ) { 
+		// always solid for ahead of the visible screen
+		if( x > m_camera_pos.x + SCREEN_WIDTH ) return true;
+
 		return IsSolid(
 			At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
 			);

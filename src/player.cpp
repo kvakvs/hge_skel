@@ -167,7 +167,8 @@ void Player::Think()
 		bool hitting_the_ceiling = solid_above_top_left || solid_above_top_right;
 		if( hitting_the_ceiling ) {
 			// stop flying, hit the ceiling
-			m_speed.y = 0;
+			m_speed.y = 0; 
+			// doesn't work: m_speed.y = -m_speed.y;
 		} else {
 			hgeRect future_pos = m_position;
 			future_pos.y1 += m_speed.y * delta;
