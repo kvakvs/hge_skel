@@ -1,3 +1,9 @@
+/* This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://sam.zoy.org/wtfpl/COPYING for more details.
+ */ 
 // to prevent multiple compiling of this header
 #pragma once
 
@@ -16,43 +22,43 @@ class GameState;
 class MyGame
 {
 public:
-	// Globally visible pointer to this class (not a brilliant example of
-	// software design, but it simplifies things)
-	static MyGame * m_game;
+    // Globally visible pointer to this class (not a brilliant example of
+    // software design, but it simplifies things)
+    static MyGame * m_game;
 
-	// Pointer to the HGE interface.
+    // Pointer to the HGE interface.
     HGE * m_hge;
 
-	// flag set to 0 or 1 to enable sound effects
-	int m_sound_enabled;
+    // flag set to 0 or 1 to enable sound effects
+    int m_sound_enabled;
 
     // Some resource handles
-    HEFFECT		m_click_sound;
-    HTEXTURE	m_mouse_cursor_tex;
+    HEFFECT     m_click_sound;
+    HTEXTURE    m_mouse_cursor_tex;
 
-	// menu background quad. As well we can use it for sky during the gameplay
-    hgeQuad		m_background_quad;
+    // menu background quad. As well we can use it for sky during the gameplay
+    hgeQuad     m_background_quad;
 
     // Pointers to the HGE objects we will use
-    hgeFont *	m_font;
-    hgeSprite *	m_mouse_cursor_sprite;
+    hgeFont *   m_font;
+    hgeSprite * m_mouse_cursor_sprite;
 
-	// This will change the way game renders and reacts to user input
-	// We will set this to different states when user starts or ends playing
-	GameState *	m_state;
+    // This will change the way game renders and reacts to user input
+    // We will set this to different states when user starts or ends playing
+    GameState * m_state;
 
-	// premade game states to change to. Since its bad idea to delete them on the
-	// fly while state change code is called from the running game state, we just
-	// premake states and store them here.
-	GameState *	m_state_options;		// shows options menu
-	GameState *	m_state_mainmenu;		// shows main menu
-	GameState *	m_state_instructions;	// shows 2 pages of instructions
-	GameState *	m_state_credits;		// shows scrolling credits text
-	GameState *	m_state_play;			// shows game world and allows to play
+    // premade game states to change to. Since its bad idea to delete them on the
+    // fly while state change code is called from the running game state, we just
+    // premake states and store them here.
+    GameState * m_state_options;        // shows options menu
+    GameState * m_state_mainmenu;       // shows main menu
+    GameState * m_state_instructions;   // shows 2 pages of instructions
+    GameState * m_state_credits;        // shows scrolling credits text
+    GameState * m_state_play;           // shows game world and allows to play
 
 
 public:
-	MyGame();
+    MyGame();
 
     static bool FrameFunc();
     static bool RenderFunc();
@@ -64,10 +70,10 @@ public:
     // this is called to end the world, when game is about to quit
     void Shutdown();
 
-	// switches game state to a new state
-	void ShowMainMenuScreen();
-	void ShowOptionsScreen();
-	void ShowInstructionsScreen();
-	void ShowCreditsScreen();
-	void ShowPlayScreen();
+    // switches game state to a new state
+    void ShowMainMenuScreen();
+    void ShowOptionsScreen();
+    void ShowInstructionsScreen();
+    void ShowCreditsScreen();
+    void ShowPlayScreen();
 };

@@ -1,3 +1,9 @@
+/* This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://sam.zoy.org/wtfpl/COPYING for more details.
+ */ 
 // to prevent multiple compiling of this header
 #pragma once
 
@@ -32,135 +38,135 @@ class WorldObject;
 // playing rules. World defines conditions when player wins.
 class World
 {
-public:	
-	// we define world cell as unsigned integer. But in future this may be changed to a
-	// more complicated struct or class etc. to have more control over world structure
-	typedef uint32_t CellType;
+public: 
+    // we define world cell as unsigned integer. But in future this may be changed to a
+    // more complicated struct or class etc. to have more control over world structure
+    typedef uint32_t CellType;
 
 protected:
-	// this is the player, World does not own the Character and will not delete it on world's end
-	Player * m_player;
+    // this is the player, World does not own the Character and will not delete it on world's end
+    Player * m_player;
 
-	// Rectangular array of the world lined up row after row, this is for memory storage
-	// simplicity, to allow worlds of arbitrary size and to avoid more complicated memory
-	// management - we let std::vector do the memory job. Use At() function to access cells
-	// by (Row,Col) coord
-	std::vector <CellType> m_world_cells;
+    // Rectangular array of the world lined up row after row, this is for memory storage
+    // simplicity, to allow worlds of arbitrary size and to avoid more complicated memory
+    // management - we let std::vector do the memory job. Use At() function to access cells
+    // by (Row,Col) coord
+    std::vector <CellType> m_world_cells;
 
-	// Leaving this as exercise for the reader - to organize sprites better
-	hgeSprite * m_sprite_brick1;
-	hgeSprite * m_sprite_sky;
-	hgeSprite * m_sprite_spikes;
+    // Leaving this as exercise for the reader - to organize sprites better
+    hgeSprite * m_sprite_brick1;
+    hgeSprite * m_sprite_sky;
+    hgeSprite * m_sprite_spikes;
 
-	HGE * m_hge;
+    HGE * m_hge;
 
-	// this also delimits max world width in cells, increase if your world grows wider
-	// actual world will be as wide as the widest line in your level file
-	// -- this const contains no secret, moving it to public section
-	static const int MAX_WORLD_WIDTH = 4096;
+    // this also delimits max world width in cells, increase if your world grows wider
+    // actual world will be as wide as the widest line in your level file
+    // -- this const contains no secret, moving it to public section
+    static const int MAX_WORLD_WIDTH = 4096;
 
-	// this contains creatures and objects and projectiles
-	typedef std::list <WorldObject *> object_list_t;
-	object_list_t m_objects;
-
-public:
-	// is the game running or paused (pause to animate player death for example)
-	bool m_pause_flag;
-
-	// This stores all loaded textures for the world, including blocks and creatures, but not player
-	SpriteManager m_sprite_manager;
-
-	// This represents camera position, actually this is top-left corner of the visible
-	// window to the game world. Camera slowly moves right increasing X
-	// making the world "slide" left
-	// -- made this public to access it from the Player when rendering player
-	hgeVector m_camera_pos;
-
-	// pixel size of world cells
-	static const int CELL_BOX_SIZE = 64;
-
-	static const int SCREEN_WIDTH = 800;
-	static const int SCREEN_HEIGHT = 600;
-
-	// world visible height will be 9 rows
-	// roughly 600 pixels screen height divided by 64 pix cell size
-	// this can be actually more than 9 if your game can also scroll vertically, but you
-	// will be able to draw only currently visible 9 rows, but this also will require
-	// writing code to auto detect map height in the input file
-	static const int VISIBLE_ROWS = SCREEN_HEIGHT/CELL_BOX_SIZE;
-
-	static const int VISIBLE_COLS = SCREEN_WIDTH/CELL_BOX_SIZE;
-
-	uint32_t m_world_width;
-	uint32_t m_world_height;
-
-	// characters used in map file to represent various world cells
-	enum {
-		WORLD_CELL_EMPTY = ' ',
-		WORLD_CELL_PLAYER_START = '@',
-		WORLD_CELL_WALL1 = '#',
-		WORLD_CELL_MONEY = '$',
-		WORLD_CELL_SPIKES = '^'
-	};
+    // this contains creatures and objects and projectiles
+    typedef std::list <WorldObject *> object_list_t;
+    object_list_t m_objects;
 
 public:
-	// Loads the default world from the filename provided
-	World( Player * plr, const std::string & filename );
-	virtual ~World();
+    // is the game running or paused (pause to animate player death for example)
+    bool m_pause_flag;
 
-	// default world can never be "won", you have to inherit the world class
-	// and override Victory function to define own rules when player wins
-	virtual bool Victory() { return false; }
+    // This stores all loaded textures for the world, including blocks and creatures, but not player
+    SpriteManager m_sprite_manager;
 
-	// Animates the world, moves monsters, etc.
-	virtual void Think();
+    // This represents camera position, actually this is top-left corner of the visible
+    // window to the game world. Camera slowly moves right increasing X
+    // making the world "slide" left
+    // -- made this public to access it from the Player when rendering player
+    hgeVector m_camera_pos;
 
-	virtual void LoadWorld( const std::string & filename );
+    // pixel size of world cells
+    static const int CELL_BOX_SIZE = 64;
 
-	// Returns pixels per second of free fall acceleration - adjust this to have things
-	// fall harder or slower, make it negative to change gravity vector up
-	// This can be modified to return different values depending if player picks up something
-	// or flips a gravity switch (if you wish)
-	virtual float GravityAccel() { return 10.0f; }
+    static const int SCREEN_WIDTH = 800;
+    static const int SCREEN_HEIGHT = 600;
 
-	// Draws the world in its current state. This function must not call or perform
-	// any other game logic, only drawing
-	virtual void Render();
+    // world visible height will be 9 rows
+    // roughly 600 pixels screen height divided by 64 pix cell size
+    // this can be actually more than 9 if your game can also scroll vertically, but you
+    // will be able to draw only currently visible 9 rows, but this also will require
+    // writing code to auto detect map height in the input file
+    static const int VISIBLE_ROWS = SCREEN_HEIGHT/CELL_BOX_SIZE;
 
-	// Returns a read/writable reference to a world cell. You can read and write to it 
-	// like if it was a real array element
-	CellType & At( uint32_t row, uint32_t col );
+    static const int VISIBLE_COLS = SCREEN_WIDTH/CELL_BOX_SIZE;
 
-	// return not reference but value. Since we can return non existing values beyond the
-	// world limits, we cannot return an actual cell, so read only there we go
-	inline CellType AtXY( float x, float y)
-	{
-		// always solid for ahead of the visible screen
-		if( x > m_camera_pos.x + SCREEN_WIDTH ) return WORLD_CELL_WALL1;
-		// always not solid below the world
-		if( y >= m_world_height * CELL_BOX_SIZE ) return WORLD_CELL_EMPTY;
+    uint32_t m_world_width;
+    uint32_t m_world_height;
 
-		return At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) );
-	}
+    // characters used in map file to represent various world cells
+    enum {
+        WORLD_CELL_EMPTY = ' ',
+        WORLD_CELL_PLAYER_START = '@',
+        WORLD_CELL_WALL1 = '#',
+        WORLD_CELL_MONEY = '$',
+        WORLD_CELL_SPIKES = '^'
+    };
 
-	// tests if rect rc is allowed to be in the world and does not collide a solid block
-	virtual bool TestBlockCollisionAt( const hgeRect & rc );
+public:
+    // Loads the default world from the filename provided
+    World( Player * plr, const std::string & filename );
+    virtual ~World();
 
-	// tests if cell type is solid or pass-through
-	inline bool IsSolidAtXY( float x, float y ) { 
-		// always solid for ahead of the visible screen
-		if( x > m_camera_pos.x + SCREEN_WIDTH ) return true;
-		// always not solid below the world
-		if( y >= m_world_height * CELL_BOX_SIZE ) return false;
+    // default world can never be "won", you have to inherit the world class
+    // and override Victory function to define own rules when player wins
+    virtual bool Victory() { return false; }
 
-		return IsSolid(
-			At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
-			);
-	}
-	virtual bool IsSolid( CellType contents );
-	virtual bool IsKillOnTouch( CellType contents );
+    // Animates the world, moves monsters, etc.
+    virtual void Think();
 
-	virtual void OnPlayerDied();
+    virtual void LoadWorld( const std::string & filename );
+
+    // Returns pixels per second of free fall acceleration - adjust this to have things
+    // fall harder or slower, make it negative to change gravity vector up
+    // This can be modified to return different values depending if player picks up something
+    // or flips a gravity switch (if you wish)
+    virtual float GravityAccel() { return 10.0f; }
+
+    // Draws the world in its current state. This function must not call or perform
+    // any other game logic, only drawing
+    virtual void Render();
+
+    // Returns a read/writable reference to a world cell. You can read and write to it 
+    // like if it was a real array element
+    CellType & At( uint32_t row, uint32_t col );
+
+    // return not reference but value. Since we can return non existing values beyond the
+    // world limits, we cannot return an actual cell, so read only there we go
+    inline CellType AtXY( float x, float y)
+    {
+        // always solid for ahead of the visible screen
+        if( x > m_camera_pos.x + SCREEN_WIDTH ) return WORLD_CELL_WALL1;
+        // always not solid below the world
+        if( y >= m_world_height * CELL_BOX_SIZE ) return WORLD_CELL_EMPTY;
+
+        return At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) );
+    }
+
+    // tests if rect rc is allowed to be in the world and does not collide a solid block
+    virtual bool TestBlockCollisionAt( const hgeRect & rc );
+
+    // tests if cell type is solid or pass-through
+    inline bool IsSolidAtXY( float x, float y ) { 
+        // always solid for ahead of the visible screen
+        if( x > m_camera_pos.x + SCREEN_WIDTH ) return true;
+        // always not solid below the world
+        if( y >= m_world_height * CELL_BOX_SIZE ) return false;
+
+        return IsSolid(
+            At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
+            );
+    }
+    virtual bool IsSolid( CellType contents );
+    virtual bool IsKillOnTouch( CellType contents );
+
+    virtual void OnPlayerDied();
 };
 
 
@@ -168,5 +174,5 @@ public:
 class WorldType1: virtual public World
 {
 public:
-	bool Victory();
+    bool Victory();
 };

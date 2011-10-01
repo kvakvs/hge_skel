@@ -1,3 +1,9 @@
+/* This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://sam.zoy.org/wtfpl/COPYING for more details.
+ */ 
 // to prevent multiple compiling of this header
 #pragma once
 
@@ -15,15 +21,15 @@ class hgeSprite;
 class SpriteManager
 {
 protected:
-	// Textures collection, this will be filled on world loading and freed on world end
-	typedef std::map <std::string, HTEXTURE> string_to_htexture_map_t;
-	string_to_htexture_map_t	m_tex_map;
+    // Textures collection, this will be filled on world loading and freed on world end
+    typedef std::map <std::string, HTEXTURE> string_to_htexture_map_t;
+    string_to_htexture_map_t    m_tex_map;
 
-	HGE * m_hge;
+    HGE * m_hge;
 
 public:
-	SpriteManager();
-	virtual ~SpriteManager();
+    SpriteManager();
+    virtual ~SpriteManager();
 
-	hgeSprite * GetSprite( const std::string & name );
+    hgeSprite * GetSprite( const std::string & name );
 };
