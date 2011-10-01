@@ -32,13 +32,14 @@ class WorldObject;
 // playing rules. World defines conditions when player wins.
 class World
 {
-protected:
-	// this is the player, World does not own the Character and will not delete it on world's end
-	Player * m_player;
-	
+public:	
 	// we define world cell as unsigned integer. But in future this may be changed to a
 	// more complicated struct or class etc. to have more control over world structure
 	typedef uint32_t CellType;
+
+protected:
+	// this is the player, World does not own the Character and will not delete it on world's end
+	Player * m_player;
 
 	// Rectangular array of the world lined up row after row, this is for memory storage
 	// simplicity, to allow worlds of arbitrary size and to avoid more complicated memory
@@ -49,6 +50,7 @@ protected:
 	// Leaving this as exercise for the reader - to organize sprites better
 	hgeSprite * m_sprite_brick1;
 	hgeSprite * m_sprite_sky;
+	hgeSprite * m_sprite_spikes;
 
 	HGE * m_hge;
 
@@ -97,17 +99,14 @@ public:
 		WORLD_CELL_EMPTY = ' ',
 		WORLD_CELL_PLAYER_START = '@',
 		WORLD_CELL_WALL1 = '#',
-		WORLD_CELL_MONEY = '$'
+		WORLD_CELL_MONEY = '$',
+		WORLD_CELL_SPIKES = '^'
 	};
 
 public:
 	// Loads the default world from the filename provided
 	World( Player * plr, const std::string & filename );
 	virtual ~World();
-
-	// Returns a read/writable reference to a world cell. You can read and write to it 
-	// like if it was a real array element
-	CellType & At( uint32_t row, uint32_t col );
 
 	// default world can never be "won", you have to inherit the world class
 	// and override Victory function to define own rules when player wins
@@ -128,19 +127,40 @@ public:
 	// any other game logic, only drawing
 	virtual void Render();
 
+	// Returns a read/writable reference to a world cell. You can read and write to it 
+	// like if it was a real array element
+	CellType & At( uint32_t row, uint32_t col );
+
+	// return not reference but value. Since we can return non existing values beyond the
+	// world limits, we cannot return an actual cell, so read only there we go
+	inline CellType AtXY( float x, float y)
+	{
+		// always solid for ahead of the visible screen
+		if( x > m_camera_pos.x + SCREEN_WIDTH ) return WORLD_CELL_WALL1;
+		// always not solid below the world
+		if( y >= m_world_height * CELL_BOX_SIZE ) return WORLD_CELL_EMPTY;
+
+		return At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) );
+	}
+
 	// tests if rect rc is allowed to be in the world and does not collide a solid block
 	virtual bool TestBlockCollisionAt( const hgeRect & rc );
 
 	// tests if cell type is solid or pass-through
-	inline bool IsSolidAt( float x, float y ) { 
+	inline bool IsSolidAtXY( float x, float y ) { 
 		// always solid for ahead of the visible screen
 		if( x > m_camera_pos.x + SCREEN_WIDTH ) return true;
+		// always not solid below the world
+		if( y >= m_world_height * CELL_BOX_SIZE ) return false;
 
 		return IsSolid(
 			At( (uint32_t)(y / CELL_BOX_SIZE), (uint32_t)(x / CELL_BOX_SIZE) )
 			);
 	}
 	virtual bool IsSolid( CellType contents );
+	virtual bool IsKillOnTouch( CellType contents );
+
+	virtual void OnPlayerDied();
 };
 
 

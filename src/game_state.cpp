@@ -489,7 +489,7 @@ bool GameState_Play::Think( MyGame * game )
 	// give the World a chance to play its internal logic, like move monsters and animate things
 	m_world->Think();
 	// give the Player a chance to check keys, test powerup collisions etc
-	if( ! m_world->m_pause_flag ) m_player->Think();
+	m_player->Think();
 
 	// TODO: Design a way to return events from the World::Think, like inform about player taking damage/dying
 

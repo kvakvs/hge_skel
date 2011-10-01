@@ -23,11 +23,13 @@ World::World( Player * plr, const std::string & filename )
 
 	m_sprite_brick1 = m_sprite_manager.GetSprite("textures/brick1.png");
 	m_sprite_sky = m_sprite_manager.GetSprite("textures/sky1.png");
+	m_sprite_spikes = m_sprite_manager.GetSprite("textures/spikes.png");
 }
 
 
 World::~World()
 {
+	delete m_sprite_spikes;
 	delete m_sprite_brick1;
 	delete m_sprite_sky;
 
@@ -110,8 +112,14 @@ void World::Think()
 	if ((m_player->m_position.x2 - m_camera_pos.x) < CELL_BOX_SIZE)
 	{
 		m_player->Die();
-		m_pause_flag = true;
+		OnPlayerDied();
 	}
+}
+
+void World::OnPlayerDied()
+{
+	// play some animations and maybe restart the game
+	m_pause_flag = true;
 }
 
 
@@ -156,6 +164,13 @@ void World::Render()
 									r * CELL_BOX_SIZE - m_camera_pos.y
 									);
 				break;
+			case WORLD_CELL_SPIKES:
+				// find position in world and render it
+				m_sprite_spikes->Render(
+									c * CELL_BOX_SIZE - m_camera_pos.x,
+									r * CELL_BOX_SIZE - m_camera_pos.y
+									);
+				break;
 			} // end switch
 		} // end for columns
 	} // end for rows
@@ -173,10 +188,10 @@ bool World::TestBlockCollisionAt( const hgeRect & rc )
 {
 	// we simplify calculation by only testing 4 corners
 	// using as advantage the fact, that player has same size as world blocks
-	if( IsSolidAt(rc.x1, rc.y1) ) return false;
-	if( IsSolidAt(rc.x1, rc.y2) ) return false;
-	if( IsSolidAt(rc.x2, rc.y1) ) return false;
-	if( IsSolidAt(rc.x2, rc.y2) ) return false;
+	if( IsSolidAtXY(rc.x1, rc.y1) ) return false;
+	if( IsSolidAtXY(rc.x1, rc.y2) ) return false;
+	if( IsSolidAtXY(rc.x2, rc.y1) ) return false;
+	if( IsSolidAtXY(rc.x2, rc.y2) ) return false;
 
 	return true;
 }
@@ -185,4 +200,9 @@ bool World::TestBlockCollisionAt( const hgeRect & rc )
 bool World::IsSolid( CellType contents )
 {
 	return contents == WORLD_CELL_WALL1;
+}
+
+bool World::IsKillOnTouch( CellType contents )
+{
+	return contents == WORLD_CELL_SPIKES;
 }

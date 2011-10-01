@@ -10,6 +10,7 @@
 
 
 class World;
+class MyGame;
 
 // Player class
 // controls keyboard interaction and game rules
@@ -27,6 +28,11 @@ protected:
 
 	// Hack this value for infinite lives
 	int		m_lives;
+	// Hack this value for infinite gold, u jelly american treasury?
+	int		m_money;
+
+	// flag to render death animation/effects/blood splash when player died
+	bool	m_is_dead;
 
 	// world we have entered, must not be NULL when game is active
 	World * m_world;
@@ -82,6 +88,7 @@ public:
 	virtual hgeSprite * GetSprite();
 
 	// Draws character over the world, using World's camera to calculate positions
+	// MyGame pointer is only needed to access the font, otherwise we don't need it
 	virtual void Render( World * world );
 
 	// called by gamestate when player enters the world and game begins
@@ -91,4 +98,7 @@ public:
 	virtual void Think();
 
 	void MoveTo( float x, float y );
+
+	// Recovery after death
+	virtual void Respawn();
 };

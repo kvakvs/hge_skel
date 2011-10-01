@@ -52,6 +52,8 @@ bool MyGame::RenderFunc()
 				"dt:%.3f\nFPS:%d",
 				m_game->m_hge->Timer_GetDelta(), m_game->m_hge->Timer_GetFPS()
 				);
+
+	// print with black shadow
 	m_game->m_font->SetColor(ARGB(255,0,0,0)); // black
 	m_game->m_font->printf( 7, 7, HGETEXT_LEFT, fps_text );
 	m_game->m_font->SetColor(ARGB(255,255,255,255)); // white
