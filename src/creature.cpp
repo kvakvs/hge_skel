@@ -11,6 +11,7 @@
 // TODO: more various creature behaviours like ability to shoot, jump, fly?
 #include "creature.h"
 #include "world.h"
+#include "player.h"
 
 
 WorldObject::WorldObject( World * owner, float x, float y ): m_world(owner)
@@ -47,6 +48,7 @@ WorldObject_Money::~WorldObject_Money()
     delete m_sprite[1];
 }
 
+
 hgeSprite * WorldObject_Money::GetSprite()
 {
     uint32_t milliseconds = GetTickCount();
@@ -55,4 +57,74 @@ hgeSprite * WorldObject_Money::GetSprite()
     uint32_t f = (milliseconds / 250) % 2;
 
     return m_sprite[f];
+}
+
+
+bool WorldObject_Money::TouchPlayer( Player * pl )
+{
+	pl->m_money += 10;
+
+	// false to indicate that object is consumed
+	return false;
+}
+
+WorldObject_Enemy1::WorldObject_Enemy1( World * owner, float x, float y )
+	: WorldObject( owner,x,y ), m_facing(FACING_RIGHT)
+{
+	m_sprite[0][0] = owner->m_sprite_manager.GetSprite( "textures/enemy1_r1.png" );
+	m_sprite[0][1] = owner->m_sprite_manager.GetSprite( "textures/enemy1_r2.png" );
+	m_sprite[1][0] = owner->m_sprite_manager.GetSprite( "textures/enemy1_r1.png" );
+	m_sprite[1][1] = owner->m_sprite_manager.GetSprite( "textures/enemy1_r2.png" );
+}
+
+
+WorldObject_Enemy1::~WorldObject_Enemy1()
+{
+    delete m_sprite[0][0];
+    delete m_sprite[0][1];
+    delete m_sprite[1][0];
+    delete m_sprite[1][1];
+}
+
+
+hgeSprite * WorldObject_Enemy1::GetSprite()
+{
+    uint32_t milliseconds = GetTickCount();
+    // we want frames to change every 333 msec from 0 to 1
+    // total of 2 frames, hence the modulo of 2
+    uint32_t f = (milliseconds / 333) % 2;
+
+    return m_sprite[m_facing][f];
+}
+
+
+void WorldObject_Enemy1::Think()
+{
+    float delta = m_world->m_hge->Timer_GetDelta();
+	if (m_facing == FACING_RIGHT) {
+		// probe the box right of our face
+		bool solid_right = m_world->IsSolidAtXY( m_box.x2+5, m_box.y1+World::CELL_BOX_SIZE/2 );
+		// probe the box under our feet
+		bool solid_bottom_right = m_world->IsSolidAtXY( m_box.x2, m_box.y2+2 );
+		if( solid_bottom_right && ! solid_right ) {
+			m_box.x1 += MOVE_SPEED * delta;
+			m_box.x2 += MOVE_SPEED * delta;
+		} else {
+			m_facing = FACING_LEFT;
+			return;
+		}
+	}
+	else if (m_facing == FACING_LEFT) {
+		// probe the box left of our face
+		bool solid_left = m_world->IsSolidAtXY( m_box.x1-5, m_box.y1+World::CELL_BOX_SIZE/2 );
+		// probe the box under our feet
+		bool solid_bottom_left = m_world->IsSolidAtXY( m_box.x1, m_box.y2+2 );
+		if( solid_bottom_left && ! solid_left) {
+			m_box.x1 -= MOVE_SPEED * delta;
+			m_box.x2 -= MOVE_SPEED * delta;
+		} else {
+			m_facing = FACING_RIGHT;
+			return;
+		}
+	}
 }

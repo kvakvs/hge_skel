@@ -96,6 +96,10 @@ void World::LoadWorld( const std::string & filename )
                 WorldObject * o = new WorldObject_Money( this, col * CELL_BOX_SIZE, row * CELL_BOX_SIZE );
                 m_objects.push_back( o );
             }
+            else if( contents == WORLD_CELL_ENEMY1 ) {
+                WorldObject * o = new WorldObject_Enemy1( this, col * CELL_BOX_SIZE, row * CELL_BOX_SIZE );
+                m_objects.push_back( o );
+            }
             else {
                 this->At( row, col ) = contents;
             }
@@ -119,6 +123,11 @@ void World::Think()
     {
         m_player->Die();
         OnPlayerDied();
+    }
+
+    for( object_list_t::iterator i = m_objects.begin(); i != m_objects.end(); ++i )
+    {
+        (*i)->Think();
     }
 }
 
@@ -208,7 +217,34 @@ bool World::IsSolid( CellType contents )
     return contents == WORLD_CELL_WALL1;
 }
 
+
 bool World::IsKillOnTouch( CellType contents )
 {
     return contents == WORLD_CELL_SPIKES;
+}
+
+
+void World::FindIntersectingObjects( const hgeRect & rc, object_list_t & result )
+{
+	result.clear(); // just in case
+	for( object_list_t::iterator i = m_objects.begin(); i != m_objects.end(); ++i )
+	{
+		if( (*i)->m_box.Intersect( & rc ) ) {
+			result.push_back( *i );
+		}
+	}
+}
+
+
+void World::RemoveObject( WorldObject * o )
+{
+	// Linear search for the object. On a large world this can be speeded up if
+	// you change to using std::map for fast key searches.
+	for( object_list_t::iterator i = m_objects.begin(); i != m_objects.end(); ++i )
+	{
+		if (*i == o) {
+			m_objects.erase( i );
+			return;
+		}
+	}
 }

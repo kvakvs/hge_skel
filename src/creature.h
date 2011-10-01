@@ -11,6 +11,7 @@
 #include <hgesprite.h>
 
 class World;
+class Player;
 
 // base Creature class
 // represents a walking or stationary creature which is able to kill player
@@ -31,7 +32,15 @@ public:
     virtual ~WorldObject() {}
 
     virtual hgeSprite * GetSprite() { return NULL; }
-    void Render();
+    virtual void Render();
+
+	virtual bool CanKillPlayerOnTouch() { return false; }
+	
+	// Perform interaction between creature/object and the player. Return false
+	// if the object is consumed or destroyed by player
+	virtual bool TouchPlayer( Player * pl ) { return true; }
+
+	virtual void Think() {}
 };
 
 
@@ -45,9 +54,28 @@ public:
     virtual ~WorldObject_Money();
 
     virtual hgeSprite * GetSprite();
+	virtual bool TouchPlayer( Player * pl );
 };
 
 
-class WorldObject_Creature: public virtual WorldObject
+class WorldObject_Enemy1: public virtual WorldObject
 {
+protected:
+    hgeSprite * m_sprite[2][2];
+	
+	static const int MOVE_SPEED = 120;
+
+    enum {
+        FACING_RIGHT = 0,
+        FACING_LEFT = 1
+    };
+
+	int m_facing;
+public:
+	WorldObject_Enemy1( World * owner, float x, float y );
+	virtual ~WorldObject_Enemy1();
+	virtual hgeSprite * GetSprite();
+	virtual bool CanKillPlayerOnTouch() { return true; }
+
+	virtual void Think();
 };

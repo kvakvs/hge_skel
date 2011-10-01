@@ -9,6 +9,7 @@
 #include "player.h"
 #include "world.h"
 #include "game.h"
+#include "creature.h"
 
 #undef min
 #include <algorithm>
@@ -19,10 +20,10 @@ Player::Player()
     , m_position(0, 0, World::CELL_BOX_SIZE-1, World::CELL_BOX_SIZE-1), m_speed(0,0)
     , m_last_facing(FACING_RIGHT), m_is_dead(false), m_money(0)
 {
-    m_character_right[0][0] = m_sprite_manager.GetSprite( "textures/mario_r1.png" );
-    m_character_right[0][1] = m_sprite_manager.GetSprite( "textures/mario_r2.png" );
-    m_character_right[1][0] = m_sprite_manager.GetSprite( "textures/mario_l1.png" );
-    m_character_right[1][1] = m_sprite_manager.GetSprite( "textures/mario_l2.png" );
+    m_sprite[0][0] = m_sprite_manager.GetSprite( "textures/mario_r1.png" );
+    m_sprite[0][1] = m_sprite_manager.GetSprite( "textures/mario_r2.png" );
+    m_sprite[1][0] = m_sprite_manager.GetSprite( "textures/mario_l1.png" );
+    m_sprite[1][1] = m_sprite_manager.GetSprite( "textures/mario_l2.png" );
 
     // this will not create another HGE, instead we will get the global
     // unique HGE object which is already started
@@ -32,10 +33,10 @@ Player::Player()
 
 Player::~Player()
 {
-    delete m_character_right[0][0];
-    delete m_character_right[0][1];
-    delete m_character_right[1][0];
-    delete m_character_right[1][1];
+    delete m_sprite[0][0];
+    delete m_sprite[0][1];
+    delete m_sprite[1][0];
+    delete m_sprite[1][1];
 }
 
 
@@ -78,7 +79,7 @@ hgeSprite * Player::GetSprite()
     // total of 2 frames, hence the modulo of 2
     uint32_t f = (milliseconds / 333) % 2;
 
-    return m_character_right[m_last_facing][f];
+    return m_sprite[m_last_facing][f];
 }
 
 
@@ -250,7 +251,7 @@ void Player::Think()
     // if we fall below the world
     if( m_position.y1 >= m_world->m_world_height * World::CELL_BOX_SIZE ) {
         Die();
-        m_world->OnPlayerDied();
+        return;
     }
 
     // if we step at least 25% cell deep into the spikes, we die
@@ -260,9 +261,38 @@ void Player::Think()
         || m_world->IsKillOnTouch( right_foot ) )
     {
         Die();
-        m_world->OnPlayerDied();
+		return;
     }
+
+	World::object_list_t touching_objects;
+	
+	// shrink our box slightly for more realistic collisions
+	hgeRect shrunken_position = m_position;
+	shrunken_position.x1 += 12; // 20% from left
+	shrunken_position.x2 -= 12; // 20% from right
+	shrunken_position.y1 += 20; // 30% from top
+	shrunken_position.y2 -= 10; // 15% from bottom
+
+	m_world->FindIntersectingObjects( shrunken_position, touching_objects );
+
+	// scan what we have found
+	for( World::object_list_t::iterator i = touching_objects.begin(); i != touching_objects.end(); ++i )
+	{
+		// if it kills us - ouch
+		if( (*i)->CanKillPlayerOnTouch() ) {
+			Die();
+			return;
+		} else {
+			if( false == (*i)->TouchPlayer( this ) ) {
+				// if touch player returned false - we consume the object
+				m_world->RemoveObject( *i );
+			}
+		}
+	}
+	// we do not own the contents of 'touching_objects', so we don't delete
+	// its contents and the list clears itself automatically
 }
+
 
 void Player::MoveTo( float x, float y )
 {
@@ -275,9 +305,13 @@ void Player::MoveTo( float x, float y )
 
 void Player::Die()
 {
+	// can't die twice in a moment
+	if( m_is_dead) return;
+
     // TODO: invent the way for player to inform the gamestate or the world about
     // level game restart or scroll back to allow player to continue
     m_is_dead = true;
+	m_world->OnPlayerDied();
 }
 
 

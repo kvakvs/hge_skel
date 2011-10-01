@@ -34,8 +34,6 @@ protected:
 
     // Hack this value for infinite lives
     int     m_lives;
-    // Hack this value for infinite gold, u jelly american treasury?
-    int     m_money;
 
     // flag to render death animation/effects/blood splash when player died
     bool    m_is_dead;
@@ -59,12 +57,15 @@ protected:
 
     SpriteManager   m_sprite_manager;
 
-    hgeSprite   * m_character_right[2][2];
+    hgeSprite   * m_sprite[2][2];
 
     HGE * m_hge;
 
 public:
-    // A bounding box for character sprite used for rendering and collisions
+    // Hack this value for infinite gold, u jelly american treasury?
+    int     m_money;
+
+	// A bounding box for character sprite used for rendering and collisions
     // for simplicity player has same size as world cells
     hgeRect     m_position;
 

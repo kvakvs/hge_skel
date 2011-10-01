@@ -42,6 +42,7 @@ public:
     // we define world cell as unsigned integer. But in future this may be changed to a
     // more complicated struct or class etc. to have more control over world structure
     typedef uint32_t CellType;
+    typedef std::list <WorldObject *> object_list_t;
 
 protected:
     // this is the player, World does not own the Character and will not delete it on world's end
@@ -58,20 +59,19 @@ protected:
     hgeSprite * m_sprite_sky;
     hgeSprite * m_sprite_spikes;
 
-    HGE * m_hge;
-
     // this also delimits max world width in cells, increase if your world grows wider
     // actual world will be as wide as the widest line in your level file
     // -- this const contains no secret, moving it to public section
     static const int MAX_WORLD_WIDTH = 4096;
 
     // this contains creatures and objects and projectiles
-    typedef std::list <WorldObject *> object_list_t;
     object_list_t m_objects;
 
 public:
-    // is the game running or paused (pause to animate player death for example)
+	// is the game running or paused (pause to animate player death for example)
     bool m_pause_flag;
+
+    HGE * m_hge;
 
     // This stores all loaded textures for the world, including blocks and creatures, but not player
     SpriteManager m_sprite_manager;
@@ -106,7 +106,8 @@ public:
         WORLD_CELL_PLAYER_START = '@',
         WORLD_CELL_WALL1 = '#',
         WORLD_CELL_MONEY = '$',
-        WORLD_CELL_SPIKES = '^'
+        WORLD_CELL_SPIKES = '^',
+		WORLD_CELL_ENEMY1 = 'A'		// enemy type 1 - edit this to add more enemies
     };
 
 public:
@@ -167,6 +168,14 @@ public:
     virtual bool IsKillOnTouch( CellType contents );
 
     virtual void OnPlayerDied();
+
+	// Scan world objects and find those whose bounding boxes touch the given box 'rc'
+	// Result is placed in the 'result' list, can be 0 or 1 or multiple objects
+	void FindIntersectingObjects( const hgeRect & rc, object_list_t & result );
+
+	// Removes given object from the m_objects, make sure you are not iterating over
+	// the m_objects list at this moment, or game will crash
+	void RemoveObject( WorldObject * o );
 };
 
 
