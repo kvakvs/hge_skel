@@ -3,7 +3,7 @@
  * and/or modify it under the terms of the Do What The Fuck You Want
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details.
- */ 
+ */
 // to prevent multiple compiling of this header
 #pragma once
 
@@ -22,33 +22,39 @@
 #include <hgefont.h>
 #include <hgegui.h>
 #include <hgecolor.h>
+#include <string>
 
 
-class hgeGUIMenuItem : public hgeGUIObject
-{
+class hgeGUIMenuItem : public hgeGUIObject {
 public:
-    hgeGUIMenuItem(int id, hgeFont *fnt, HEFFECT snd, float x, float y, float delay, char *title);
+    hgeGUIMenuItem(int id, hgeFont *fnt, HEFFECT snd, float x, float y, float delay, const char *title);
 
-    virtual void    Render();
-    virtual void    Update(float dt);
+    virtual void Render();
 
-    virtual void    Enter();
-    virtual void    Leave();
-    virtual bool    IsDone();
-    virtual void    Focus(bool bFocused);
-    virtual void    MouseOver(bool bOver);
+    virtual void Update(float dt);
 
-    virtual bool    MouseLButton(bool bDown);
-    virtual bool    KeyClick(int key, int chr);
+    virtual void Enter();
+
+    virtual void Leave();
+
+    virtual bool IsDone();
+
+    virtual void Focus(bool bFocused);
+
+    virtual void MouseOver(bool bOver);
+
+    virtual bool MouseLButton(bool bDown);
+
+    virtual bool KeyClick(int key, int chr);
 
 private:
-    hgeFont     *fnt;
-    HEFFECT     snd;
-    float       delay;
-    char        *title;
+    hgeFont *fnt;
+    HEFFECT snd;
+    float delay;
+    std::string title;
 
-    hgeColor    scolor, dcolor, scolor2, dcolor2, sshadow, dshadow;
-    hgeColor    color, shadow;
-    float       soffset, doffset, offset;
-    float       timer, timer2;
+    hgeColor scolor, dcolor, scolor2, dcolor2, sshadow, dshadow;
+    hgeColor color, shadow;
+    float soffset, doffset, offset;
+    float timer, timer2;
 };
