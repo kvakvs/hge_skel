@@ -4,6 +4,8 @@ This is a platform scroller (somewhat similar to Super Mario with few difference
 game skeleton to use with HGE library, which does very basic functions and leaves
 lot of placeholder functions for you to code your very own side-scroller game.
 
+![image](https://raw.githubusercontent.com/kvakvs/hge_skel/master/screen_for_readme.png)
+
 How to make this work?
 ======================
 This thing works with either HGE clone from here https://github.com/kvakvs/hge
