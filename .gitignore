@@ -2,5 +2,6 @@
 *.ilk
 *.log
 *.pdb
-linklib/
+/linklib/
 *.log
+/cmake-build-*
