@@ -9,12 +9,13 @@ How to make this work?
 This thing works with either HGE clone from here https://github.com/kvakvs/hge
 or original HGE 1.8.1 located at http://hge.relishgames.com
 
-This thing will require compiled HGE.DLL and HGE.LIB, or, if you go further and want
-to build it from source, you will need either DirectX 8 SDK or DirectX 9 SDK from 
-Microsoft website, and the source of HGE library. I (the author) was nice and put
-the compiled DLL and LIB for you to try the game right out of the box, but you can
-go ahead and replace them at any time.
+1. Checkout HGE source from github.com/kvakvs/hge
+2. Build HGE
+3. Configure `CMakeLists.txt` of HGE_Skeleton to have correct path to the HGE 
+	directory. It will be used to find include and link files.
+4. Ensure you have recent copy of HGE.dll and BASS.dll in your `bin/`
 
 To create solution file, run one of BAT files attached. You can also run CMake to
 support some other IDE, see what it can do:
 http://www.cmake.org/cmake/help/cmake-2-8-docs.html#section_Generators
+(CLion IDE supports CMakeLists and does not need any BAT files to be executed).

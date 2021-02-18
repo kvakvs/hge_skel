@@ -6,3 +6,5 @@
 /_build
 /linklib/
 /cmake-build-*
+/.idea
+
